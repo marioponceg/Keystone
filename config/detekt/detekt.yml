@@ -1,0 +1,27 @@
+# Detekt configuration for Foundry.
+# Builds upon the default ruleset (buildUponDefaultConfig = true in the convention plugin),
+# so this file only contains deliberate deviations from the defaults.
+
+formatting:
+  active: true
+  android: true
+  autoCorrect: true
+  FunctionName:
+    active: false # composables are PascalCase; covered by naming>FunctionNaming below
+
+complexity:
+  LongParameterList:
+    # Token classes and composables take many named parameters by design (an M3
+    # ColorScheme has ~30); the rule keeps protecting regular functions.
+    ignoreAnnotated: ['Immutable', 'Composable']
+
+style:
+  ForbiddenComment:
+    active: false # TODO/FIXME comments are allowed; they are tracked in PRs
+  MagicNumber:
+    ignorePropertyDeclaration: true # token values (dp/sp scales) are literal by nature
+    ignoreAnnotated: ['Immutable'] # token classes are literal by nature; covers factory bodies too
+
+naming:
+  FunctionNaming:
+    ignoreAnnotated: ['Composable', 'Test'] # PascalCase composables, backtick test names
