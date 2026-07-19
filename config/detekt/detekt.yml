@@ -1,4 +1,4 @@
-# Detekt configuration for Foundry.
+# Detekt configuration for Keystone.
 # Builds upon the default ruleset (buildUponDefaultConfig = true in the convention plugin),
 # so this file only contains deliberate deviations from the defaults.
 
