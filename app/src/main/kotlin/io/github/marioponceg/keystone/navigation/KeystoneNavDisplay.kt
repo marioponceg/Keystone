@@ -21,7 +21,14 @@ fun KeystoneNavDisplay(backStack: NavBackStack<NavKey>) {
         ),
         entryProvider = entryProvider {
             entry<HomeKey> {
-                HomeScreen(onNavigateToCharacter = { id -> backStack.add(id.toKey()) })
+                HomeScreen(
+                    onNavigateToCharacter = { id ->
+                        val key = id.toKey()
+                        if (backStack.lastOrNull() != key) {
+                            backStack.add(key)
+                        }
+                    },
+                )
             }
             entry<CharacterDetailKey> { key ->
                 // Placeholder until Task 9 lands CharacterDetailScreen.
