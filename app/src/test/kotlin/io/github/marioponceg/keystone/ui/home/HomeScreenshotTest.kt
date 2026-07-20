@@ -14,7 +14,9 @@ import org.robolectric.annotation.GraphicsMode
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 // sdk pinned to 35: the highest android-all image Robolectric ships (compileSdk is 37).
-@Config(sdk = [35])
+// Tall viewport so the content state (affixes + form + recents) fits in one capture and the
+// goldens actually guard the whole screen, not just what fits a default phone height.
+@Config(sdk = [35], qualifiers = "w411dp-h1200dp")
 class HomeScreenshotTest {
 
     @get:Rule
