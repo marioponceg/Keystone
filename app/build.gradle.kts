@@ -76,6 +76,6 @@ dependencies {
     testImplementation(libs.roborazzi)
     testImplementation(libs.roborazzi.compose)
     testImplementation(libs.androidx.compose.ui.test.junit4)
-    testImplementation(libs.androidx.compose.ui.test.manifest)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
     detektPlugins(libs.detekt.formatting)
 }

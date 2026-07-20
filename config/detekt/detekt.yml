@@ -21,6 +21,8 @@ style:
   MagicNumber:
     ignorePropertyDeclaration: true # token values (dp/sp scales) are literal by nature
     ignoreAnnotated: ['Immutable'] # token classes are literal by nature; covers factory bodies too
+  UnusedPrivateMember:
+    ignoreAnnotated: ['Preview'] # tooling-only entry points; called by Android Studio, not code
 
 naming:
   FunctionNaming:
