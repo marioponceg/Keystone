@@ -42,14 +42,14 @@ Three modules, clean-architecture layering:
 │  Compose UI (Foundry) · ViewModels (MVVM/UDF) · Navigation3      │
 │  Hilt DI · Quill setup (LogcatSink, QuillInterceptor)            │
 │  DataStore impl of RecentSearchesRepository/RegionPreference     │
-└───────────────────────────┬───────────────────────────────────--┘
+└────────────────────────────┬────────────────────────────────────┘
                              │ depends on
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │ core-data  (pure Kotlin/JVM)                                     │
 │  RaiderIoApi (Conduit client facade) · DTOs + mappers            │
 │  Repository implementations for the remote side                 │
-└───────────────────────────┬───────────────────────────────────--┘
+└────────────────────────────┬────────────────────────────────────┘
                              │ depends on
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
@@ -77,7 +77,8 @@ and a Roborazzi screenshot test, light and dark.
 
 ## Tech stack
 
-- Kotlin 2.2, AGP 9.2 with built-in Kotlin (no `kotlin-android` plugin), JVM toolchain 21
+- Kotlin 2.2, AGP 9.2 with built-in Kotlin (no `kotlin-android` plugin); JVM toolchain 21 on the
+  pure-Kotlin/JVM modules (`core-domain`, `core-data`), Java 17 source/target on `app`
 - Jetpack Compose (BOM 2026.06) with the Foundry design system
 - Navigation3, Hilt, DataStore Preferences, kotlinx.serialization
 - Conduit (networking) + Quill (logging) — see above
