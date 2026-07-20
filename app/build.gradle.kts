@@ -2,13 +2,11 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
     alias(libs.plugins.detekt)
     alias(libs.plugins.roborazzi)
 }
-
-// The `hilt`/`ksp` plugins and the hilt-android/hilt-compiler dependencies are deliberately
-// deferred to Task 6: the Hilt Gradle plugin fails configuration without a `@HiltAndroidApp`
-// application class, and that class does not exist until Task 6 wires up DI.
 
 android {
     namespace = "io.github.marioponceg.keystone"
@@ -68,6 +66,8 @@ dependencies {
     implementation(libs.conduit.serialization.kotlinx)
     implementation(libs.quill.android)
     implementation(libs.quill.conduit)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
     testImplementation(libs.junit)
     testImplementation(libs.kotlin.test)
     testImplementation(libs.kotlinx.coroutines.test)
