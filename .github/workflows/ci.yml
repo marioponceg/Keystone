@@ -40,7 +40,14 @@ jobs:
         run: ./gradlew detekt
 
       - name: Coverage gate (Kover)
-        run: ./gradlew koverVerify
+        run: ./gradlew koverXmlReport koverVerify
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: core-domain/build/reports/kover/report.xml,core-data/build/reports/kover/report.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
 
       - name: Screenshot tests (Roborazzi)
         run: ./gradlew verifyRoborazziDebug
