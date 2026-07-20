@@ -28,8 +28,7 @@ class CharacterDetailStateProvider : PreviewParameterProvider<CharacterDetailUiS
             overall = 3500.0,
             colorHex = "#ff8000",
             roles = listOf(
-                RoleScore(Role.TANK, 0.0, "#9d9d9d"),
-                RoleScore(Role.HEALER, 0.0, "#9d9d9d"),
+                RoleScore(Role.TANK, 2980.4, "#e268a8"),
                 RoleScore(Role.DPS, 3500.0, "#ff8000"),
             ),
         ),

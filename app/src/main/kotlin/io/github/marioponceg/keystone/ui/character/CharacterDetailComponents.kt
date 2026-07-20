@@ -21,6 +21,7 @@ import io.github.marioponceg.keystone.domain.model.RoleScore
 import io.github.marioponceg.keystone.domain.model.SeasonScore
 import io.github.marioponceg.keystone.ui.common.WowClassColors
 import io.github.marioponceg.keystone.ui.common.parseScoreColor
+import java.util.Locale
 import kotlin.time.Duration
 
 @Composable
@@ -45,7 +46,7 @@ internal fun ScoreCard(score: SeasonScore) {
     val colors = FoundryTheme.colors
     FoundryCard(modifier = Modifier.fillMaxWidth()) {
         FoundryText(
-            text = "%.1f".format(score.overall),
+            text = "%.1f".format(Locale.US, score.overall),
             style = FoundryTextStyle.Display,
             color = parseScoreColor(score.colorHex, colors.onSurface),
         )
@@ -65,7 +66,7 @@ private fun RoleRow(role: RoleScore, modifier: Modifier = Modifier) {
     ) {
         FoundryText(text = role.role.label(), style = FoundryTextStyle.Label)
         FoundryText(
-            text = "%.1f".format(role.score),
+            text = "%.1f".format(Locale.US, role.score),
             style = FoundryTextStyle.Label,
             color = parseScoreColor(role.colorHex, colors.onSurface),
         )
@@ -109,7 +110,7 @@ internal fun DungeonRunCard(run: DungeonRun) {
                     color = colors.onSurfaceMuted,
                 )
                 FoundryText(
-                    text = "%.1f".format(run.score),
+                    text = "%.1f".format(Locale.US, run.score),
                     style = FoundryTextStyle.Label,
                 )
             }
@@ -122,4 +123,8 @@ private const val MAX_UPGRADES = 3
 private const val SECONDS_PER_MINUTE = 60
 
 private fun formatDuration(duration: Duration): String =
-    "%d:%02d".format(duration.inWholeMinutes, duration.inWholeSeconds % SECONDS_PER_MINUTE)
+    "%d:%02d".format(
+        Locale.US,
+        duration.inWholeMinutes,
+        duration.inWholeSeconds % SECONDS_PER_MINUTE,
+    )
