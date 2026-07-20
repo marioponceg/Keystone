@@ -8,6 +8,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import io.github.marioponceg.foundry.components.FoundryText
+import io.github.marioponceg.keystone.ui.home.HomeScreen
 
 @Composable
 fun KeystoneNavDisplay(backStack: NavBackStack<NavKey>) {
@@ -20,8 +21,14 @@ fun KeystoneNavDisplay(backStack: NavBackStack<NavKey>) {
         ),
         entryProvider = entryProvider {
             entry<HomeKey> {
-                // Placeholder until Task 8 lands HomeScreen.
-                FoundryText(text = "Keystone")
+                HomeScreen(
+                    onNavigateToCharacter = { id ->
+                        val key = id.toKey()
+                        if (backStack.lastOrNull() != key) {
+                            backStack.add(key)
+                        }
+                    },
+                )
             }
             entry<CharacterDetailKey> { key ->
                 // Placeholder until Task 9 lands CharacterDetailScreen.
