@@ -91,7 +91,10 @@ fun HomeContent(state: HomeUiState, onEvent: (HomeEvent) -> Unit) {
         }
     }
     if (state.isRealmSheetVisible) {
-        ModalBottomSheet(onDismissRequest = { onEvent(HomeEvent.RealmSheetDismissed) }) {
+        ModalBottomSheet(
+            onDismissRequest = { onEvent(HomeEvent.RealmSheetDismissed) },
+            containerColor = FoundryTheme.colors.surface,
+        ) {
             RealmPickerContent(
                 query = state.realmQuery,
                 results = state.realmResults,
@@ -178,15 +181,36 @@ private fun SearchForm(state: HomeUiState, onEvent: (HomeEvent) -> Unit) {
 /** Tappable trigger standing in for the realm field; opens the realm-picker sheet. */
 @Composable
 private fun RealmTrigger(realmName: String?, onClick: () -> Unit) {
+    val spacing = FoundryTheme.spacing
     FoundryCard(
         modifier = Modifier.fillMaxWidth(),
         onClick = onClick,
     ) {
-        FoundryText(
-            text = realmName ?: "Select realm",
-            style = FoundryTextStyle.Body,
-            color = if (realmName == null) FoundryTheme.colors.onSurfaceMuted else Color.Unspecified,
-        )
+        Column {
+            FoundryText(
+                text = "Realm",
+                style = FoundryTextStyle.Caption,
+                color = FoundryTheme.colors.onSurfaceMuted,
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = spacing.xs),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                FoundryText(
+                    text = realmName ?: "Select realm",
+                    style = FoundryTextStyle.Body,
+                    color = if (realmName == null) FoundryTheme.colors.onSurfaceMuted else Color.Unspecified,
+                    modifier = Modifier.weight(1f),
+                )
+                FoundryText(
+                    text = "▾",
+                    style = FoundryTextStyle.Body,
+                    color = FoundryTheme.colors.onSurfaceMuted,
+                )
+            }
+        }
     }
 }
 
