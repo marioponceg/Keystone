@@ -1,7 +1,123 @@
 # Keystone
 
-WoW Mythic+ companion app for Android — the portfolio capstone consuming
-[Conduit](https://github.com/marioponceg/Conduit), [Quill](https://github.com/marioponceg/Quill)
-and [Foundry](https://github.com/marioponceg/Foundry) from Maven Central.
+[![CI](https://github.com/marioponceg/Keystone/actions/workflows/ci.yml/badge.svg)](https://github.com/marioponceg/Keystone/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/marioponceg/Keystone/branch/main/graph/badge.svg)](https://codecov.io/gh/marioponceg/Keystone)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-Work in progress; v0.1 in development.
+A WoW Mythic+ companion for Android — search a character, see their season score and best
+dungeon runs, and check the weekly affixes. Keystone is the portfolio capstone: it's the
+consumer app for the author's three published libraries, all on Maven Central under
+`io.github.marioponceg` at `0.1.0`:
+
+- [Conduit](https://github.com/marioponceg/Conduit) — coroutine-first networking, used via
+  `conduit-core` / `conduit-engine-okhttp` / `conduit-serialization-kotlinx` for the Raider.IO
+  client.
+- [Quill](https://github.com/marioponceg/Quill) — structured logging, used via `quill-android`
+  (`LogcatSink`, configured in `KeystoneApplication`) and `quill-conduit` (`QuillInterceptor` on
+  the HTTP client, logging every request/response as a structured event).
+- [Foundry](https://github.com/marioponceg/Foundry) — the Compose design system, used via
+  `foundry-components` for every piece of UI in the app.
+
+Data comes from the public, auth-free [Raider.IO](https://raider.io) API. No backend, no login,
+no analytics.
+
+## Features
+
+- **Character search** — name + realm + region, with region chips and the last-used region
+  persisted across launches.
+- **Mythic+ profile** — season score (colored to match the official Raider.IO score bands) with
+  a per-role breakdown, and best runs per dungeon with upgrade stars, clear times and
+  class-colored character names.
+- **Weekly affixes** — a card on the home screen showing the current M+ affix rotation.
+- **Recent searches** — the last 10 lookups, deduplicated, saved only after a successful
+  profile load (so a typo never pollutes the list), with per-item delete.
+
+## Architecture
+
+Three modules, clean-architecture layering:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ app  (com.android.application)                                  │
+│  Compose UI (Foundry) · ViewModels (MVVM/UDF) · Navigation3      │
+│  Hilt DI · Quill setup (LogcatSink, QuillInterceptor)            │
+│  DataStore impl of RecentSearchesRepository/RegionPreference     │
+└────────────────────────────┬────────────────────────────────────┘
+                             │ depends on
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ core-data  (pure Kotlin/JVM)                                     │
+│  RaiderIoApi (Conduit client facade) · DTOs + mappers            │
+│  Repository implementations for the remote side                 │
+└────────────────────────────┬────────────────────────────────────┘
+                             │ depends on
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ core-domain  (pure Kotlin/JVM)                                   │
+│  Models · KeystoneResult / KeystoneError · 7 use cases            │
+│  4 repository contracts — no Android, no third-party runtime     │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+`core-domain` and `core-data` are pure Kotlin/JVM modules (possible for `core-data` because
+Conduit itself is JVM-pure), kept Android-free with a future KMP/iOS migration in mind. `app` is
+the only module that touches Android — Compose, Hilt, Navigation3 and the DataStore-backed repo
+implementations all live there.
+
+Screens follow MVVM with strict unidirectional data flow: one immutable `UiState` per screen
+exposed as `StateFlow`, user events as a sealed interface, one-shot effects kept separate from
+state. Every `UiState` variant feeds both a Compose `@Preview` (via `PreviewParameterProvider`)
+and a Roborazzi screenshot test, light and dark.
+
+## Screenshots
+
+| Home | Character detail |
+|---|---|
+| ![Home](app/src/test/screenshots/home_content_light.png) | ![Character detail](app/src/test/screenshots/character_detail_content_light.png) |
+
+## Tech stack
+
+- Kotlin 2.2, AGP 9.2 with built-in Kotlin (no `kotlin-android` plugin); JVM toolchain 21 on the
+  pure-Kotlin/JVM modules (`core-domain`, `core-data`), Java 17 source/target on `app`
+- Jetpack Compose (BOM 2026.06) with the Foundry design system
+- Navigation3, Hilt, DataStore Preferences, kotlinx.serialization
+- Conduit (networking) + Quill (logging) — see above
+- JUnit 5 for the pure-Kotlin modules, coroutines-test + Turbine for ViewModels, Robolectric +
+  Roborazzi for screenshot tests
+- detekt (zero tolerance for unresolved issues) + Kover (90% minimum line coverage on
+  `core-domain` / `core-data`)
+
+## Building
+
+```sh
+./gradlew build detekt koverVerify verifyRoborazziDebug
+```
+
+- `build` compiles everything and runs all unit tests + Android Lint.
+- `detekt` runs static analysis and formatting checks (ktlint rules via detekt-formatting).
+- `koverVerify` enforces the 90% minimum coverage rule on the two pure-Kotlin modules.
+- `verifyRoborazziDebug` checks screenshot tests against the committed goldens in
+  `app/src/test/screenshots/`.
+
+CI runs the same four commands on every pull request.
+
+## Roadmap
+
+Future versions, not in scope for v0.1:
+
+- Crashlytics, including a `QuillSink` that forwards Quill events to it
+- Battle.net OAuth and the official Blizzard API, replacing the auth-free Raider.IO endpoints
+- Character avatars via Coil
+- Opening a run on raider.io directly from the app (Custom Tabs)
+- Affix localization
+
+## Design notes
+
+Keystone is a portfolio project built with senior-engineering discipline: every design unit
+landed as a reviewed PR with tests first, 90% minimum line coverage enforced in CI, screenshot
+tests for every visual state, and the reasoning behind each decision recorded in
+[AGENTS.md](AGENTS.md).
+
+## License
+
+[Apache 2.0](LICENSE)
