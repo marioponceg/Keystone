@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import io.github.marioponceg.keystone.domain.model.CharacterId
+import io.github.marioponceg.keystone.domain.model.Realm
 import io.github.marioponceg.keystone.domain.model.RecentSearch
 import io.github.marioponceg.keystone.domain.model.Region
 import io.github.marioponceg.keystone.domain.model.push
@@ -22,7 +23,8 @@ private val StorageJson = Json { ignoreUnknownKeys = true }
 @Serializable
 private data class StoredSearch(
     val region: String,
-    val realm: String,
+    @SerialName("realm_name") val realmName: String,
+    @SerialName("realm_slug") val realmSlug: String,
     val name: String,
     @SerialName("searched_at") val searchedAtEpochMillis: Long,
 )
@@ -38,6 +40,10 @@ class RecentSearchesDataStore(private val dataStore: DataStore<Preferences>) : R
         }
     }
 
+    internal suspend fun rawWrite(raw: String) {
+        dataStore.edit { it[KEY] = raw }
+    }
+
     override suspend fun remove(id: CharacterId) {
         dataStore.edit { preferences ->
             preferences[KEY] = encode(decode(preferences[KEY]).filterNot { it.id == id })
@@ -51,7 +57,7 @@ class RecentSearchesDataStore(private val dataStore: DataStore<Preferences>) : R
             .mapNotNull { stored ->
                 val region = Region.entries.firstOrNull { it.name == stored.region } ?: return@mapNotNull null
                 RecentSearch(
-                    id = CharacterId(region, stored.realm, stored.name),
+                    id = CharacterId(region, Realm(stored.realmName, stored.realmSlug), stored.name),
                     searchedAtEpochMillis = stored.searchedAtEpochMillis,
                 )
             }
@@ -62,7 +68,8 @@ class RecentSearchesDataStore(private val dataStore: DataStore<Preferences>) : R
             searches.map {
                 StoredSearch(
                     region = it.id.region.name,
-                    realm = it.id.realm,
+                    realmName = it.id.realm.name,
+                    realmSlug = it.id.realm.slug,
                     name = it.id.name,
                     searchedAtEpochMillis = it.searchedAtEpochMillis,
                 )

@@ -2,6 +2,7 @@ package io.github.marioponceg.keystone.storage
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import io.github.marioponceg.keystone.domain.model.CharacterId
+import io.github.marioponceg.keystone.domain.model.Realm
 import io.github.marioponceg.keystone.domain.model.RecentSearch
 import io.github.marioponceg.keystone.domain.model.Region
 import kotlinx.coroutines.CoroutineScope
@@ -35,7 +36,10 @@ class RecentSearchesDataStoreTest {
     }
 
     private fun search(name: String, at: Long = 1) =
-        RecentSearch(CharacterId(Region.EU, "tarren-mill", name), searchedAtEpochMillis = at)
+        RecentSearch(
+            CharacterId(Region.EU, Realm("Tarren Mill", "tarren-mill"), name),
+            searchedAtEpochMillis = at,
+        )
 
     @Test
     fun `save and observe round-trips newest first`() = runBlocking {
@@ -59,5 +63,13 @@ class RecentSearchesDataStoreTest {
         store.save(search("b"))
         store.remove(search("a").id)
         assertEquals(listOf("b"), store.observe().first().map { it.id.name })
+    }
+
+    @Test
+    fun `entries stored under the old string-realm schema are discarded`() = runBlocking {
+        val store = store()
+        // v0.1 shape: realm as a bare string, no realm_slug/realm_name.
+        store.rawWrite("""[{"region":"EU","realm":"tarren-mill","name":"Old","searched_at":1}]""")
+        assertEquals(emptyList<String>(), store.observe().first().map { it.id.name })
     }
 }
