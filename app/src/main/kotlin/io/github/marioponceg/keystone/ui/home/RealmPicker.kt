@@ -10,6 +10,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import io.github.marioponceg.foundry.components.FoundryCard
 import io.github.marioponceg.foundry.components.FoundryText
@@ -30,7 +32,7 @@ fun RealmPickerContent(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(FoundryTheme.colors.surface)
+            .background(FoundryTheme.colors.surface) // Surface background for golden/preview fidelity.
             .padding(spacing.md),
         verticalArrangement = Arrangement.spacedBy(spacing.sm),
     ) {
@@ -63,5 +65,20 @@ fun RealmPickerContent(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun RealmPickerContentPreview(
+    @PreviewParameter(RealmPickerStateProvider::class) state: Pair<String, List<Realm>>,
+) {
+    FoundryTheme {
+        RealmPickerContent(
+            query = state.first,
+            results = state.second,
+            onQueryChange = {},
+            onRealmSelected = {},
+        )
     }
 }
