@@ -27,6 +27,6 @@ class BundledRealmRepositoryTest {
     @Test
     fun `realms are sorted alphabetically by name`() {
         val names = repository.realms(Region.EU).map { it.name }
-        assertEquals(names.sortedBy { it.lowercase() }, names)
+        assertEquals(names.sortedWith(String.CASE_INSENSITIVE_ORDER), names)
     }
 }

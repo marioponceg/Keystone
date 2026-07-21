@@ -16,5 +16,6 @@ class BundledRealmRepository(private val json: Json = KeystoneJson) : RealmRepos
         return runCatching { json.decodeFromString<List<RealmDto>>(raw) }
             .getOrDefault(emptyList())
             .map { Realm(name = it.name, slug = it.slug) }
+            .sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.name })
     }
 }
