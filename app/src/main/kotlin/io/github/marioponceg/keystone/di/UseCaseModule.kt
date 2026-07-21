@@ -6,9 +6,11 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.github.marioponceg.keystone.domain.repository.AffixesRepository
 import io.github.marioponceg.keystone.domain.repository.CharacterRepository
+import io.github.marioponceg.keystone.domain.repository.RealmRepository
 import io.github.marioponceg.keystone.domain.repository.RecentSearchesRepository
 import io.github.marioponceg.keystone.domain.repository.RegionPreferenceRepository
 import io.github.marioponceg.keystone.domain.usecase.GetCharacterProfile
+import io.github.marioponceg.keystone.domain.usecase.GetRealms
 import io.github.marioponceg.keystone.domain.usecase.GetWeeklyAffixes
 import io.github.marioponceg.keystone.domain.usecase.ObserveRecentSearches
 import io.github.marioponceg.keystone.domain.usecase.ObserveSelectedRegion
@@ -47,4 +49,7 @@ object UseCaseModule {
     @Provides
     fun provideSaveSelectedRegion(repository: RegionPreferenceRepository): SaveSelectedRegion =
         SaveSelectedRegion(repository)
+
+    @Provides
+    fun provideGetRealms(repository: RealmRepository): GetRealms = GetRealms(repository)
 }
