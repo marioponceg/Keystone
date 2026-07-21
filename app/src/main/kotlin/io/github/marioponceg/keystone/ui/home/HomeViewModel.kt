@@ -7,6 +7,7 @@ import io.github.marioponceg.keystone.domain.error.KeystoneResult
 import io.github.marioponceg.keystone.domain.model.CharacterId
 import io.github.marioponceg.keystone.domain.model.Realm
 import io.github.marioponceg.keystone.domain.model.Region
+import io.github.marioponceg.keystone.domain.usecase.GetRealms
 import io.github.marioponceg.keystone.domain.usecase.GetWeeklyAffixes
 import io.github.marioponceg.keystone.domain.usecase.ObserveRecentSearches
 import io.github.marioponceg.keystone.domain.usecase.ObserveSelectedRegion
@@ -26,6 +27,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getWeeklyAffixes: GetWeeklyAffixes,
+    private val getRealms: GetRealms,
     observeRecentSearches: ObserveRecentSearches,
     private val removeRecentSearch: RemoveRecentSearch,
     observeSelectedRegion: ObserveSelectedRegion,
@@ -54,7 +56,16 @@ class HomeViewModel @Inject constructor(
     fun onEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.NameChanged -> _uiState.update { it.copy(name = event.value) }
-            is HomeEvent.RealmChanged -> _uiState.update { it.copy(realm = event.value) }
+            is HomeEvent.RealmFieldTapped -> openRealmSheet()
+            is HomeEvent.RealmQueryChanged -> _uiState.update {
+                it.copy(realmQuery = event.value, realmResults = filterRealms(it.region, event.value))
+            }
+            is HomeEvent.RealmSelected -> _uiState.update {
+                it.copy(selectedRealm = event.realm, isRealmSheetVisible = false, realmQuery = "")
+            }
+            is HomeEvent.RealmSheetDismissed -> _uiState.update {
+                it.copy(isRealmSheetVisible = false, realmQuery = "")
+            }
             is HomeEvent.RegionSelected -> onRegionSelected(event.region)
             is HomeEvent.SearchSubmitted -> onSearchSubmitted()
             is HomeEvent.RecentSelected -> _effects.trySend(HomeEffect.NavigateToCharacter(event.search.id))
@@ -63,8 +74,20 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private fun openRealmSheet() {
+        _uiState.update {
+            it.copy(isRealmSheetVisible = true, realmQuery = "", realmResults = filterRealms(it.region, ""))
+        }
+    }
+
+    private fun filterRealms(region: Region, query: String): List<Realm> {
+        val all = getRealms(region)
+        if (query.isBlank()) return all
+        return all.filter { it.name.contains(query.trim(), ignoreCase = true) }
+    }
+
     private fun onRegionSelected(region: Region) {
-        _uiState.update { it.copy(region = region) }
+        _uiState.update { it.copy(region = region, selectedRealm = null) }
         viewModelScope.launch {
             saveSelectedRegion(region)
             loadAffixes(region)
@@ -73,11 +96,8 @@ class HomeViewModel @Inject constructor(
 
     private fun onSearchSubmitted() {
         val state = uiState.value
-        if (!state.canSearch) return
-        // TRANSITIONAL (removed in Task 3, replaced by the realm picker): wrap the typed
-        // realm text into a Realm so CharacterId compiles. Slug approximated from the text.
-        val realmText = state.realm.trim()
-        val realm = Realm(name = realmText, slug = realmText.lowercase().replace(" ", "-").replace("'", ""))
+        val realm = state.selectedRealm ?: return
+        if (state.name.isBlank()) return
         _effects.trySend(HomeEffect.NavigateToCharacter(CharacterId(state.region, realm, state.name.trim())))
     }
 
