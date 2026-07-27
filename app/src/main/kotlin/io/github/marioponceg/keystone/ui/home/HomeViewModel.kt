@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.marioponceg.keystone.domain.error.KeystoneResult
 import io.github.marioponceg.keystone.domain.model.CharacterId
+import io.github.marioponceg.keystone.domain.model.Realm
 import io.github.marioponceg.keystone.domain.model.Region
 import io.github.marioponceg.keystone.domain.usecase.GetWeeklyAffixes
 import io.github.marioponceg.keystone.domain.usecase.ObserveRecentSearches
@@ -73,11 +74,11 @@ class HomeViewModel @Inject constructor(
     private fun onSearchSubmitted() {
         val state = uiState.value
         if (!state.canSearch) return
-        _effects.trySend(
-            HomeEffect.NavigateToCharacter(
-                CharacterId(state.region, state.realm.trim(), state.name.trim()),
-            ),
-        )
+        // TRANSITIONAL (removed in Task 3, replaced by the realm picker): wrap the typed
+        // realm text into a Realm so CharacterId compiles. Slug approximated from the text.
+        val realmText = state.realm.trim()
+        val realm = Realm(name = realmText, slug = realmText.lowercase().replace(" ", "-").replace("'", ""))
+        _effects.trySend(HomeEffect.NavigateToCharacter(CharacterId(state.region, realm, state.name.trim())))
     }
 
     private suspend fun loadAffixes(region: Region) {

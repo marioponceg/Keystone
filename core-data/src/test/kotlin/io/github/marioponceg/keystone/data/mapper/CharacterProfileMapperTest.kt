@@ -8,6 +8,7 @@ import io.github.marioponceg.keystone.data.remote.dto.SeasonScoresDto
 import io.github.marioponceg.keystone.data.remote.dto.SegmentDto
 import io.github.marioponceg.keystone.data.remote.dto.SegmentsDto
 import io.github.marioponceg.keystone.domain.model.CharacterId
+import io.github.marioponceg.keystone.domain.model.Realm
 import io.github.marioponceg.keystone.domain.model.Region
 import io.github.marioponceg.keystone.domain.model.Role
 import kotlinx.serialization.encodeToString
@@ -18,7 +19,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 class CharacterProfileMapperTest {
 
-    private val requested = CharacterId(Region.EU, "tarren-mill", "Zoyu")
+    private val requested = CharacterId(Region.EU, Realm("Tarren Mill", "tarren-mill"), "Zoyu")
 
     private fun decode(): CharacterProfileDto =
         KeystoneJson.decodeFromString(fixture("character_profile.json"))

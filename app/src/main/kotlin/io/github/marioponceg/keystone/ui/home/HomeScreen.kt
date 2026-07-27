@@ -77,7 +77,7 @@ fun HomeContent(state: HomeUiState, onEvent: (HomeEvent) -> Unit) {
             // Key must be Bundle-storable; CharacterId itself is not, so flatten it to a string.
             items(
                 state.recentSearches,
-                key = { "${it.id.region.name}/${it.id.realm}/${it.id.name}" },
+                key = { "${it.id.region.name}/${it.id.realm.slug}/${it.id.name}" },
             ) { recent ->
                 RecentSearchRow(recent = recent, onEvent = onEvent)
             }
@@ -177,7 +177,7 @@ private fun RecentSearchRow(recent: RecentSearch, onEvent: (HomeEvent) -> Unit) 
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             FoundryText(
-                text = "${recent.id.name} · ${recent.id.realm} (${recent.id.region.name})",
+                text = "${recent.id.name} · ${recent.id.realm.name} (${recent.id.region.name})",
                 style = FoundryTextStyle.Body,
             )
             FoundryText(

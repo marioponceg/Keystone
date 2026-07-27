@@ -76,7 +76,7 @@ private fun NotFoundState(id: CharacterId, onEvent: (CharacterDetailEvent) -> Un
     ) {
         FoundryText(text = "Character not found", style = FoundryTextStyle.Title)
         FoundryText(
-            text = "${id.name} — ${id.realm} (${id.region.name})",
+            text = "${id.name} — ${id.realm.name} (${id.region.name})",
             color = FoundryTheme.colors.onSurfaceMuted,
         )
         FoundryButton(

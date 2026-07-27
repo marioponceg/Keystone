@@ -5,6 +5,7 @@ import io.github.marioponceg.keystone.domain.error.KeystoneError
 import io.github.marioponceg.keystone.domain.error.KeystoneResult
 import io.github.marioponceg.keystone.domain.model.Affix
 import io.github.marioponceg.keystone.domain.model.CharacterId
+import io.github.marioponceg.keystone.domain.model.Realm
 import io.github.marioponceg.keystone.domain.model.RecentSearch
 import io.github.marioponceg.keystone.domain.model.Region
 import io.github.marioponceg.keystone.domain.model.WeeklyAffixes
@@ -91,7 +92,9 @@ class HomeViewModelTest {
         vm.effects.test {
             vm.onEvent(HomeEvent.SearchSubmitted)
             assertEquals(
-                HomeEffect.NavigateToCharacter(CharacterId(Region.EU, "Tarren Mill", "Thrall")),
+                HomeEffect.NavigateToCharacter(
+                    CharacterId(Region.EU, Realm("Tarren Mill", "tarren-mill"), "Thrall"),
+                ),
                 awaitItem(),
             )
         }
@@ -99,7 +102,7 @@ class HomeViewModelTest {
 
     @Test
     fun `recent tap navigates and recent remove deletes`() = runTest {
-        val id = CharacterId(Region.EU, "tarren-mill", "Gingi")
+        val id = CharacterId(Region.EU, Realm("Tarren Mill", "tarren-mill"), "Gingi")
         recentsRepository.save(RecentSearch(id, searchedAtEpochMillis = 1))
         val vm = viewModel()
         advanceUntilIdle()

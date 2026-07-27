@@ -7,6 +7,7 @@ import io.github.marioponceg.keystone.domain.fake.FakeCharacterRepository
 import io.github.marioponceg.keystone.domain.fake.FakeRecentSearchesRepository
 import io.github.marioponceg.keystone.domain.fake.FakeRegionPreferenceRepository
 import io.github.marioponceg.keystone.domain.model.CharacterId
+import io.github.marioponceg.keystone.domain.model.Realm
 import io.github.marioponceg.keystone.domain.model.RecentSearch
 import io.github.marioponceg.keystone.domain.model.Region
 import kotlinx.coroutines.flow.first
@@ -16,7 +17,7 @@ import kotlin.test.assertEquals
 
 class UseCasesTest {
 
-    private val id = CharacterId(Region.EU, "tarren-mill", "Thrall")
+    private val id = CharacterId(Region.EU, Realm("Tarren Mill", "tarren-mill"), "Thrall")
 
     @Test
     fun `GetCharacterProfile delegates to the repository`() = runTest {

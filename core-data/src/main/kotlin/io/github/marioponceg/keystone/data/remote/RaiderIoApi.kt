@@ -18,7 +18,7 @@ class RaiderIoApi(private val client: ConduitClient) {
         client.get(
             "/api/v1/characters/profile" +
                 "?region=${id.region.slug}" +
-                "&realm=${id.realm.encodeQuery()}" +
+                "&realm=${id.realm.slug.encodeQuery()}" +
                 "&name=${id.name.encodeQuery()}" +
                 "&fields=${PROFILE_FIELDS.encodeQuery()}",
         )

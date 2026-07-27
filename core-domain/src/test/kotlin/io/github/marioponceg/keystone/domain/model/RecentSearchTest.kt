@@ -6,7 +6,7 @@ import kotlin.test.assertEquals
 class RecentSearchTest {
 
     private fun search(name: String, at: Long) =
-        RecentSearch(CharacterId(Region.EU, "tarren-mill", name), searchedAtEpochMillis = at)
+        RecentSearch(CharacterId(Region.EU, Realm("Tarren Mill", "tarren-mill"), name), searchedAtEpochMillis = at)
 
     @Test
     fun `push places the newest search first`() {
