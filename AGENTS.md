@@ -104,3 +104,12 @@ Keystone/
   tests for anything visual). PR descriptions explain the *why*.
 - **PRs are squash-merged.** The PR title becomes the commit on `main`, so it must follow
   Conventional Commits — CI validates this (`.github/workflows/pr-title.yml`).
+- **Stacked PRs** (a PR whose base is another feature branch, as multi-task plans produce): once
+  the base PR is squash-merged, **rebase the stacked branch onto `main` and force-push with
+  `--force-with-lease` before merging it**. GitHub retargets the stacked PR to `main` by itself —
+  the repository has *Automatically delete head branches* enabled, and deleting the base branch
+  retargets every open PR pointing at it — but the retargeted diff still replays the base PR's
+  files, because the squash commit on `main` is not the commits the stacked branch was built on.
+  The rebase drops those already-upstream commits and restores the one-design-unit diff the PR is
+  supposed to show. Merging a stacked PR whose base branch still exists writes the squash commit
+  onto that branch instead of `main`; PRs #12 and #16 exist only to recover work lost that way.
