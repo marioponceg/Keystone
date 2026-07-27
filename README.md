@@ -23,8 +23,9 @@ no analytics.
 
 ## Features
 
-- **Character search** — name + realm + region, with region chips and the last-used region
-  persisted across launches.
+- **Character search** — character name plus a searchable realm picker backed by a bundled
+  per-region realm list (no network round-trip to resolve a realm), with region chips and the
+  last-used region persisted across launches.
 - **Mythic+ profile** — season score (colored to match the official Raider.IO score bands) with
   a per-role breakdown, and best runs per dungeon with upgrade stars, clear times and
   class-colored character names.
@@ -39,23 +40,23 @@ Three modules, clean-architecture layering:
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │ app  (com.android.application)                                  │
-│  Compose UI (Foundry) · ViewModels (MVVM/UDF) · Navigation3      │
-│  Hilt DI · Quill setup (LogcatSink, QuillInterceptor)            │
-│  DataStore impl of RecentSearchesRepository/RegionPreference     │
+│  Compose UI (Foundry) · ViewModels (MVVM/UDF) · Navigation3     │
+│  Hilt DI · Quill setup (LogcatSink, QuillInterceptor)           │
+│  DataStore impl of RecentSearchesRepository/RegionPreference    │
 └────────────────────────────┬────────────────────────────────────┘
                              │ depends on
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│ core-data  (pure Kotlin/JVM)                                     │
-│  RaiderIoApi (Conduit client facade) · DTOs + mappers            │
-│  Repository implementations for the remote side                 │
+│ core-data  (pure Kotlin/JVM)                                    │
+│  RaiderIoApi (Conduit client facade) · DTOs + mappers           │
+│  Repo impls (remote) · bundled per-region realm snapshots       │
 └────────────────────────────┬────────────────────────────────────┘
                              │ depends on
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│ core-domain  (pure Kotlin/JVM)                                   │
-│  Models · KeystoneResult / KeystoneError · 7 use cases            │
-│  4 repository contracts — no Android, no third-party runtime     │
+│ core-domain  (pure Kotlin/JVM)                                  │
+│  Models · KeystoneResult / KeystoneError · 8 use cases          │
+│  5 repository contracts — no Android, no third-party runtime    │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
