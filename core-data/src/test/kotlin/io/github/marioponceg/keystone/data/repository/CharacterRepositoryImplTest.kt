@@ -10,6 +10,7 @@ import io.github.marioponceg.keystone.data.remote.RaiderIoApi
 import io.github.marioponceg.keystone.domain.error.KeystoneError
 import io.github.marioponceg.keystone.domain.error.KeystoneResult
 import io.github.marioponceg.keystone.domain.model.CharacterId
+import io.github.marioponceg.keystone.domain.model.Realm
 import io.github.marioponceg.keystone.domain.model.Region
 import kotlinx.coroutines.test.runTest
 import java.io.IOException
@@ -20,7 +21,7 @@ import kotlin.test.assertTrue
 
 class CharacterRepositoryImplTest {
 
-    private val id = CharacterId(Region.EU, "Tarren Mill", "Zoyu")
+    private val id = CharacterId(Region.EU, Realm("Tarren Mill", "tarren-mill"), "Zoyu")
 
     private fun repository(engine: FakeEngine): CharacterRepositoryImpl {
         val client = conduit {
@@ -38,7 +39,7 @@ class CharacterRepositoryImplTest {
         val profile = assertIs<KeystoneResult.Success<*>>(result)
         val url = checkNotNull(engine.lastRequest).url
         assertTrue(url.contains("region=eu"))
-        assertTrue(url.contains("realm=Tarren%20Mill"))
+        assertTrue(url.contains("realm=tarren-mill"))
         assertTrue(url.contains("name=Zoyu"))
         val encodedFields = url.contains("fields=mythic_plus_scores_by_season%3Acurrent%2Cmythic_plus_best_runs")
         val plainFields = url.contains("fields=mythic_plus_scores_by_season:current,mythic_plus_best_runs")

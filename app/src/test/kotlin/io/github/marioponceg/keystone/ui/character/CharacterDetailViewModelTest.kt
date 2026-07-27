@@ -4,6 +4,7 @@ import io.github.marioponceg.keystone.domain.error.KeystoneError
 import io.github.marioponceg.keystone.domain.error.KeystoneResult
 import io.github.marioponceg.keystone.domain.model.CharacterId
 import io.github.marioponceg.keystone.domain.model.CharacterProfile
+import io.github.marioponceg.keystone.domain.model.Realm
 import io.github.marioponceg.keystone.domain.model.Region
 import io.github.marioponceg.keystone.domain.model.SeasonScore
 import io.github.marioponceg.keystone.domain.usecase.GetCharacterProfile
@@ -26,8 +27,13 @@ class CharacterDetailViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private val key = CharacterDetailKey(region = "EU", realm = "Tarren Mill", name = "Gingi")
-    private val id = CharacterId(Region.EU, "Tarren Mill", "Gingi")
+    private val key = CharacterDetailKey(
+        region = "EU",
+        realmSlug = "tarren-mill",
+        realmName = "Tarren Mill",
+        name = "Gingi",
+    )
+    private val id = CharacterId(Region.EU, Realm("Tarren Mill", "tarren-mill"), "Gingi")
     private val profile = CharacterProfile(
         id = id,
         name = "Gingi",

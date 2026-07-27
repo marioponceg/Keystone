@@ -3,12 +3,14 @@ package io.github.marioponceg.keystone.ui
 import io.github.marioponceg.keystone.domain.error.KeystoneResult
 import io.github.marioponceg.keystone.domain.model.CharacterId
 import io.github.marioponceg.keystone.domain.model.CharacterProfile
+import io.github.marioponceg.keystone.domain.model.Realm
 import io.github.marioponceg.keystone.domain.model.RecentSearch
 import io.github.marioponceg.keystone.domain.model.Region
 import io.github.marioponceg.keystone.domain.model.WeeklyAffixes
 import io.github.marioponceg.keystone.domain.model.push
 import io.github.marioponceg.keystone.domain.repository.AffixesRepository
 import io.github.marioponceg.keystone.domain.repository.CharacterRepository
+import io.github.marioponceg.keystone.domain.repository.RealmRepository
 import io.github.marioponceg.keystone.domain.repository.RecentSearchesRepository
 import io.github.marioponceg.keystone.domain.repository.RegionPreferenceRepository
 import kotlinx.coroutines.flow.Flow
@@ -47,4 +49,8 @@ class FakeRegionPreferenceRepository : RegionPreferenceRepository {
     override suspend fun save(region: Region) {
         this.region.value = region
     }
+}
+
+class FakeRealmRepository(private val byRegion: Map<Region, List<Realm>>) : RealmRepository {
+    override fun realms(region: Region): List<Realm> = byRegion[region].orEmpty()
 }

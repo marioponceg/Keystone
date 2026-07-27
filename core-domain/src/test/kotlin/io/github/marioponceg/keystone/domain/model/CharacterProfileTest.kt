@@ -6,7 +6,7 @@ import kotlin.test.assertEquals
 class CharacterProfileTest {
     @Test
     fun `CharacterProfile exposes all fields`() {
-        val id = CharacterId(Region.EU, "tarren-mill", "Thrall")
+        val id = CharacterId(Region.EU, Realm("Tarren Mill", "tarren-mill"), "Thrall")
         val roles = listOf(RoleScore(Role.DPS, 2801.4, "#ff8000"))
         val score = SeasonScore(2815.2, "#ff8000", roles)
         val runs = emptyList<DungeonRun>()
