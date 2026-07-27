@@ -101,6 +101,16 @@ and a Roborazzi screenshot test, light and dark.
 
 CI runs the same four commands on every pull request.
 
+### Refreshing the realm list
+
+Realm snapshots in `core-data/src/main/resources/realms/` are generated once from Raider.IO's
+realm listing (they change ~yearly). To refresh:
+
+    python3 scripts/generate-realms.py
+
+No credentials are needed. The script uses an undocumented Raider.IO endpoint at generation
+time only — the app itself calls only Raider.IO's documented v1 API.
+
 ## Roadmap
 
 Future versions, not in scope for v0.1:
