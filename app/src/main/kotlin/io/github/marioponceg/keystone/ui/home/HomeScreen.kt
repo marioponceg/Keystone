@@ -12,10 +12,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -47,6 +50,7 @@ fun HomeScreen(
     HomeContent(state = state, onEvent = viewModel::onEvent)
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeContent(state: HomeUiState, onEvent: (HomeEvent) -> Unit) {
     val spacing = FoundryTheme.spacing
@@ -84,6 +88,19 @@ fun HomeContent(state: HomeUiState, onEvent: (HomeEvent) -> Unit) {
         }
         item {
             Spacer(modifier = Modifier.height(spacing.lg))
+        }
+    }
+    if (state.isRealmSheetVisible) {
+        ModalBottomSheet(
+            onDismissRequest = { onEvent(HomeEvent.RealmSheetDismissed) },
+            containerColor = FoundryTheme.colors.surface,
+        ) {
+            RealmPickerContent(
+                query = state.realmQuery,
+                results = state.realmResults,
+                onQueryChange = { onEvent(HomeEvent.RealmQueryChanged(it)) },
+                onRealmSelected = { onEvent(HomeEvent.RealmSelected(it)) },
+            )
         }
     }
 }
@@ -136,12 +153,7 @@ private fun SearchForm(state: HomeUiState, onEvent: (HomeEvent) -> Unit) {
             label = "Character",
             modifier = Modifier.fillMaxWidth(),
         )
-        FoundryTextField(
-            value = state.realm,
-            onValueChange = { onEvent(HomeEvent.RealmChanged(it)) },
-            label = "Realm",
-            modifier = Modifier.fillMaxWidth(),
-        )
+        RealmTrigger(realmName = state.selectedRealm?.name, onClick = { onEvent(HomeEvent.RealmFieldTapped) })
         Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm)) {
             Region.entries.forEach { region ->
                 FoundryButton(
@@ -163,6 +175,42 @@ private fun SearchForm(state: HomeUiState, onEvent: (HomeEvent) -> Unit) {
                 .fillMaxWidth()
                 .padding(top = spacing.sm),
         )
+    }
+}
+
+/** Tappable trigger standing in for the realm field; opens the realm-picker sheet. */
+@Composable
+private fun RealmTrigger(realmName: String?, onClick: () -> Unit) {
+    val spacing = FoundryTheme.spacing
+    FoundryCard(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onClick,
+    ) {
+        Column {
+            FoundryText(
+                text = "Realm",
+                style = FoundryTextStyle.Caption,
+                color = FoundryTheme.colors.onSurfaceMuted,
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = spacing.xs),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                FoundryText(
+                    text = realmName ?: "Select realm",
+                    style = FoundryTextStyle.Body,
+                    color = if (realmName == null) FoundryTheme.colors.onSurfaceMuted else Color.Unspecified,
+                    modifier = Modifier.weight(1f),
+                )
+                FoundryText(
+                    text = "▾",
+                    style = FoundryTextStyle.Body,
+                    color = FoundryTheme.colors.onSurfaceMuted,
+                )
+            }
+        }
     }
 }
 
