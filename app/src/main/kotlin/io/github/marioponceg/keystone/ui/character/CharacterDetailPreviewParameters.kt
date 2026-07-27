@@ -6,6 +6,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import io.github.marioponceg.keystone.domain.model.CharacterId
 import io.github.marioponceg.keystone.domain.model.CharacterProfile
 import io.github.marioponceg.keystone.domain.model.DungeonRun
+import io.github.marioponceg.keystone.domain.model.Realm
 import io.github.marioponceg.keystone.domain.model.Region
 import io.github.marioponceg.keystone.domain.model.Role
 import io.github.marioponceg.keystone.domain.model.RoleScore
@@ -16,7 +17,7 @@ import kotlin.time.Duration.Companion.seconds
 // Filename follows Task 8's HomePreviewParameters.kt precedent (shared preview data), rather
 // than the single-class convention `MatchingDeclarationName`/`Filename` expects.
 class CharacterDetailStateProvider : PreviewParameterProvider<CharacterDetailUiState> {
-    private val id = CharacterId(Region.EU, "Tarren Mill", "Gingi")
+    private val id = CharacterId(Region.EU, Realm("Tarren Mill", "tarren-mill"), "Gingi")
 
     private val profile = CharacterProfile(
         id = id,
