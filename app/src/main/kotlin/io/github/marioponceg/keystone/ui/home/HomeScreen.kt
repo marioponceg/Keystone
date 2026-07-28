@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.runtime.Composable
@@ -63,6 +65,14 @@ fun HomeScreen(
  */
 internal const val HOME_TWO_COLUMN_MIN_WIDTH_DP = 600
 
+/**
+ * Two columns also need vertical room. Below this height the single-column layout wins even when
+ * the window is wide: the two-column layout does not scroll as a whole, so in a short window
+ * (split screen, a half-open foldable, a resized desktop window) the title and affixes card alone
+ * could push the form out of reach. A 400dp-tall window should not pretend to be a tablet.
+ */
+internal const val HOME_TWO_COLUMN_MIN_HEIGHT_DP = 600
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeContent(state: HomeUiState, onEvent: (HomeEvent) -> Unit) {
@@ -71,7 +81,9 @@ fun HomeContent(state: HomeUiState, onEvent: (HomeEvent) -> Unit) {
             .fillMaxSize()
             .background(FoundryTheme.colors.background),
     ) {
-        if (maxWidth >= HOME_TWO_COLUMN_MIN_WIDTH_DP.dp) {
+        if (maxWidth >= HOME_TWO_COLUMN_MIN_WIDTH_DP.dp &&
+            maxHeight >= HOME_TWO_COLUMN_MIN_HEIGHT_DP.dp
+        ) {
             HomeTwoColumnContent(state = state, onEvent = onEvent)
         } else {
             HomeSingleColumnContent(state = state, onEvent = onEvent)
@@ -158,11 +170,17 @@ private fun HomeTwoColumnContent(state: HomeUiState, onEvent: (HomeEvent) -> Uni
         // unlike a text field, which does not.
         AffixesCard(state = state.affixes, onRetry = { onEvent(HomeEvent.RetryAffixes) })
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                // Takes the height left over after the title and affixes so neither column can
+                // overflow the window: each scrolls inside its own bounded space.
+                .weight(1f),
             horizontalArrangement = Arrangement.spacedBy(spacing.md),
         ) {
             Column(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(spacing.md),
             ) {
                 SearchForm(state = state, onEvent = onEvent)
