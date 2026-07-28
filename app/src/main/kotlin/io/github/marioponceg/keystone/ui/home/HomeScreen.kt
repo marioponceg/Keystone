@@ -1,7 +1,11 @@
 package io.github.marioponceg.keystone.ui.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -20,8 +24,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -76,6 +87,9 @@ internal const val HOME_TWO_COLUMN_MIN_WIDTH_DP = 600
  * could push the form out of reach. A 400dp-tall window should not pretend to be a tablet.
  */
 internal const val HOME_TWO_COLUMN_MIN_HEIGHT_DP = 600
+
+internal const val TAG_NAME_FIELD = "home_name_field"
+internal const val TAG_REALM_LIST = "realm_picker_list"
 
 @Composable
 fun HomeContent(
@@ -247,7 +261,23 @@ private fun SearchForm(state: HomeUiState, onEvent: (HomeEvent) -> Unit) {
             value = state.name,
             onValueChange = { onEvent(HomeEvent.NameChanged(it)) },
             label = "Character",
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag(TAG_NAME_FIELD)
+                // Enter submits only when the form is complete, matching the Search button's
+                // enabled state — a keyboard user must not be able to trigger what a pointer user
+                // cannot.
+                .onKeyEvent { event ->
+                    if (event.type == KeyEventType.KeyDown &&
+                        event.key == Key.Enter &&
+                        state.canSearch
+                    ) {
+                        onEvent(HomeEvent.SearchSubmitted)
+                        true
+                    } else {
+                        false
+                    }
+                },
         )
         RealmTrigger(realmName = state.selectedRealm?.name, onClick = { onEvent(HomeEvent.RealmFieldTapped) })
         Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm)) {
@@ -310,10 +340,29 @@ private fun RealmTrigger(realmName: String?, onClick: () -> Unit) {
     }
 }
 
+/**
+ * The hover border is the pointer counterpart of the keyboard highlight: on a desktop window a row
+ * that never reacts to the cursor reads as inert. It costs nothing on touch, where hover never
+ * fires.
+ *
+ * The border repeats [FoundryCard]'s own shape; `border`'s default is a rectangle, which would cut
+ * the corners off.
+ */
 @Composable
 private fun RecentSearchRow(recent: RecentSearch, onEvent: (HomeEvent) -> Unit) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isHovered by interactionSource.collectIsHoveredAsState()
     FoundryCard(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .hoverable(interactionSource)
+            .then(
+                if (isHovered) {
+                    Modifier.border(1.dp, FoundryTheme.colors.accent, FoundryTheme.shapes.lg)
+                } else {
+                    Modifier
+                },
+            ),
         onClick = { onEvent(HomeEvent.RecentSelected(recent)) },
     ) {
         Row(
