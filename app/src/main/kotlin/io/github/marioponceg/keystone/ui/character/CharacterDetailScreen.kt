@@ -28,10 +28,12 @@ import io.github.marioponceg.keystone.domain.model.CharacterProfile
 fun CharacterDetailScreen(
     onBack: () -> Unit,
     viewModel: CharacterDetailViewModel,
+    showBackAction: Boolean = true,
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     CharacterDetailContent(
         state = state,
+        showBackAction = showBackAction,
         onEvent = { event ->
             when (event) {
                 CharacterDetailEvent.Back -> onBack()
@@ -42,7 +44,11 @@ fun CharacterDetailScreen(
 }
 
 @Composable
-fun CharacterDetailContent(state: CharacterDetailUiState, onEvent: (CharacterDetailEvent) -> Unit) {
+fun CharacterDetailContent(
+    state: CharacterDetailUiState,
+    onEvent: (CharacterDetailEvent) -> Unit,
+    showBackAction: Boolean = true,
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -50,7 +56,11 @@ fun CharacterDetailContent(state: CharacterDetailUiState, onEvent: (CharacterDet
     ) {
         when (state) {
             is CharacterDetailUiState.Loading -> LoadingState()
-            is CharacterDetailUiState.NotFound -> NotFoundState(id = state.id, onEvent = onEvent)
+            is CharacterDetailUiState.NotFound -> NotFoundState(
+                id = state.id,
+                onEvent = onEvent,
+                showBackAction = showBackAction,
+            )
             is CharacterDetailUiState.Error -> ErrorState(onEvent = onEvent)
             is CharacterDetailUiState.Content -> ContentState(profile = state.profile)
         }
@@ -65,7 +75,11 @@ private fun LoadingState() {
 }
 
 @Composable
-private fun NotFoundState(id: CharacterId, onEvent: (CharacterDetailEvent) -> Unit) {
+private fun NotFoundState(
+    id: CharacterId,
+    onEvent: (CharacterDetailEvent) -> Unit,
+    showBackAction: Boolean,
+) {
     val spacing = FoundryTheme.spacing
     Column(
         modifier = Modifier
@@ -79,11 +93,15 @@ private fun NotFoundState(id: CharacterId, onEvent: (CharacterDetailEvent) -> Un
             text = "${id.name} — ${id.realm.name} (${id.region.name})",
             color = FoundryTheme.colors.onSurfaceMuted,
         )
-        FoundryButton(
-            text = "Back",
-            onClick = { onEvent(CharacterDetailEvent.Back) },
-            modifier = Modifier.padding(top = spacing.sm),
-        )
+        // A detail pane inside a list-detail layout must not offer "back": the list is already on
+        // screen next to it, so there is nowhere to go back to.
+        if (showBackAction) {
+            FoundryButton(
+                text = "Back",
+                onClick = { onEvent(CharacterDetailEvent.Back) },
+                modifier = Modifier.padding(top = spacing.sm),
+            )
+        }
     }
 }
 
