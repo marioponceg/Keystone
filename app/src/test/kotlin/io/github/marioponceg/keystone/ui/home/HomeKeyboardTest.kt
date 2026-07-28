@@ -1,6 +1,7 @@
 package io.github.marioponceg.keystone.ui.home
 
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performKeyInput
@@ -83,19 +84,10 @@ class HomeKeyboardTest {
 
     @Test
     fun arrowDownThenEnterSelectsTheFirstRealm() {
-        val results = listOf(
-            Realm(name = "Silvermoon", slug = "silvermoon"),
-            Realm(name = "Stormrage", slug = "stormrage"),
-        )
         val events = mutableListOf<HomeEvent>()
-        val withResults = searchableState.copy(
-            isRealmSheetVisible = true,
-            realmQuery = "s",
-            realmResults = results,
-        )
         composeRule.setContent {
             FoundryTheme {
-                HomeContent(state = withResults, onEvent = { events += it })
+                HomeContent(state = stateWithRealms(), onEvent = { events += it })
             }
         }
 
@@ -106,8 +98,72 @@ class HomeKeyboardTest {
         }
 
         assertEquals(
-            HomeEvent.RealmSelected(results.first()),
+            HomeEvent.RealmSelected(realms.first()),
             events.filterIsInstance<HomeEvent.RealmSelected>().firstOrNull(),
         )
     }
+
+    /**
+     * The other keyboard tests all call [requestFocus] on the list first, which is the one step a
+     * real user never performs — the picker is opened by clicking the trigger, so focus stays on
+     * the trigger unless the picker claims it. This test deliberately omits that call, so it fails
+     * unless the picker requests focus for itself when it opens.
+     */
+    @Test
+    fun theRealmListTakesFocusWhenThePickerOpens() {
+        val events = mutableListOf<HomeEvent>()
+        composeRule.setContent {
+            FoundryTheme {
+                HomeContent(state = stateWithRealms(), onEvent = { events += it })
+            }
+        }
+
+        composeRule.onNodeWithTag(TAG_REALM_LIST).assertIsFocused()
+        composeRule.onNodeWithTag(TAG_REALM_LIST).performKeyInput {
+            pressKey(Key.DirectionDown)
+            pressKey(Key.Enter)
+        }
+
+        assertEquals(
+            HomeEvent.RealmSelected(realms.first()),
+            events.filterIsInstance<HomeEvent.RealmSelected>().firstOrNull(),
+            "Arrow keys must work without tabbing into the list first; got $events",
+        )
+    }
+
+    /**
+     * Up-arrow on a freshly opened list must not highlight a row: coercing `-1 - 1` up to `0` would
+     * make Up and Down both land on the first result, so Enter would then select it.
+     */
+    @Test
+    fun arrowUpDoesNothingWhenNoRealmIsHighlighted() {
+        val events = mutableListOf<HomeEvent>()
+        composeRule.setContent {
+            FoundryTheme {
+                HomeContent(state = stateWithRealms(), onEvent = { events += it })
+            }
+        }
+
+        composeRule.onNodeWithTag(TAG_REALM_LIST).requestFocus()
+        composeRule.onNodeWithTag(TAG_REALM_LIST).performKeyInput {
+            pressKey(Key.DirectionUp)
+            pressKey(Key.Enter)
+        }
+
+        assertTrue(
+            events.filterIsInstance<HomeEvent.RealmSelected>().isEmpty(),
+            "Up from nothing highlighted must not select a realm; got $events",
+        )
+    }
+
+    private val realms = listOf(
+        Realm(name = "Silvermoon", slug = "silvermoon"),
+        Realm(name = "Stormrage", slug = "stormrage"),
+    )
+
+    private fun stateWithRealms() = searchableState.copy(
+        isRealmSheetVisible = true,
+        realmQuery = "s",
+        realmResults = realms,
+    )
 }

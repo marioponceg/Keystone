@@ -17,11 +17,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
@@ -59,13 +60,19 @@ fun RealmPickerContent(
     val listState = rememberLazyListState()
     // Reset on every new result list: index 2 of the old results means nothing in the new ones.
     // -1 is "nothing highlighted", so the picker opens with no row pre-selected.
-    var highlighted by remember(results) { mutableIntStateOf(-1) }
+    val highlighted = remember(results) { mutableIntStateOf(-1) }
+    val focusRequester = remember { FocusRequester() }
 
-    LaunchedEffect(highlighted) {
-        if (highlighted >= 0) {
-            listState.animateScrollToItem(highlighted)
+    LaunchedEffect(highlighted.intValue) {
+        if (highlighted.intValue >= 0) {
+            listState.animateScrollToItem(highlighted.intValue)
         }
     }
+
+    // The picker is opened by clicking the trigger, so focus stays on the trigger unless the picker
+    // claims it — and Compose only routes key events to the focused node and its ancestors. Without
+    // this the whole keyboard contract below is unreachable for a real user.
+    LaunchedEffect(Unit) { focusRequester.requestFocus() }
 
     Column(
         modifier = Modifier
@@ -73,23 +80,14 @@ fun RealmPickerContent(
             .background(FoundryTheme.colors.surface) // Surface background for golden/preview fidelity.
             .padding(spacing.md)
             .testTag(TAG_REALM_LIST)
+            .focusRequester(focusRequester)
             .focusable()
-            .onKeyEvent { event ->
-                when (event.toRealmListCommand()) {
-                    RealmListCommand.Next ->
-                        if (results.isNotEmpty()) {
-                            highlighted = (highlighted + 1).coerceAtMost(results.lastIndex)
-                        }
-                    RealmListCommand.Previous ->
-                        if (results.isNotEmpty()) {
-                            highlighted = (highlighted - 1).coerceAtLeast(0)
-                        }
-                    RealmListCommand.Confirm -> results.getOrNull(highlighted)?.let(onRealmSelected)
-                    RealmListCommand.Dismiss -> onDismiss()
-                    null -> return@onKeyEvent false
-                }
-                true
-            },
+            .realmListKeys(
+                results = results,
+                highlighted = highlighted,
+                onRealmSelected = onRealmSelected,
+                onDismiss = onDismiss,
+            ),
         verticalArrangement = Arrangement.spacedBy(spacing.sm),
     ) {
         FoundryText(text = "Select realm", style = FoundryTextStyle.Heading)
@@ -110,7 +108,7 @@ fun RealmPickerContent(
             RealmResults(
                 results = results,
                 listState = listState,
-                highlighted = highlighted,
+                highlighted = highlighted.intValue,
                 onRealmSelected = onRealmSelected,
             )
         }
@@ -135,6 +133,54 @@ private fun RealmResults(
                 isHighlighted = index == highlighted,
                 onClick = { onRealmSelected(realm) },
             )
+        }
+    }
+}
+
+/**
+ * Arrow / Enter / Escape handling for the realm list, as a plain (non-`@Composable`) `Modifier`
+ * factory so it stays out of [RealmPickerContent]'s body and off Compose's discouraged
+ * `@Composable`-modifier path.
+ *
+ * The returned `Boolean` is consumption: `false` lets the event carry on to the platform.
+ *
+ * [highlighted] is the state itself rather than its value on purpose: two keys can arrive between
+ * recompositions (Down then Enter), and a captured `Int` would leave Enter reading the pre-Down
+ * index. Reading `intValue` inside the handler always sees the current selection.
+ */
+private fun Modifier.realmListKeys(
+    results: List<Realm>,
+    highlighted: MutableIntState,
+    onRealmSelected: (Realm) -> Unit,
+    onDismiss: () -> Unit,
+): Modifier = onKeyEvent { event ->
+    val command = event.toRealmListCommand() ?: return@onKeyEvent false
+    val current = highlighted.intValue
+    when (command) {
+        RealmListCommand.Next -> {
+            if (results.isNotEmpty()) {
+                highlighted.intValue = (current + 1).coerceAtMost(results.lastIndex)
+            }
+            true
+        }
+        // From -1 ("nothing highlighted") Up must stay put; coercing -1 - 1 up to 0 would make Up
+        // and Down both land on the first result.
+        RealmListCommand.Previous -> {
+            if (current > 0) {
+                highlighted.intValue = current - 1
+            }
+            true
+        }
+        // Nothing highlighted means nothing to confirm: let Enter fall through rather than swallow
+        // it, so the key still reaches whatever would otherwise handle it.
+        RealmListCommand.Confirm ->
+            results.getOrNull(current)?.let {
+                onRealmSelected(it)
+                true
+            } ?: false
+        RealmListCommand.Dismiss -> {
+            onDismiss()
+            true
         }
     }
 }
