@@ -46,15 +46,16 @@ class KeystoneShellScreenshotTest {
 
     @OptIn(ExperimentalMaterial3AdaptiveApi::class)
     @Composable
-    private fun TestShell(withCharacter: Boolean, tabletop: Boolean = false) {
-        val backStack = rememberNavBackStack(HomeKey)
-        if (withCharacter && backStack.size == 1) {
-            backStack.add(selectedKey)
+    private fun TestShell(withCharacter: Boolean) {
+        val backStack = if (withCharacter) {
+            rememberNavBackStack(HomeKey, selectedKey)
+        } else {
+            rememberNavBackStack(HomeKey)
         }
         val directive = calculatePaneScaffoldDirective(
             WindowAdaptiveInfo(
                 windowSizeClass = WindowSizeClass.compute(1280f, 900f),
-                windowPosture = Posture(isTabletop = tabletop),
+                windowPosture = Posture(),
             ),
         ).copy(horizontalPartitionSpacerSize = 0.dp)
         KeystoneShell(
