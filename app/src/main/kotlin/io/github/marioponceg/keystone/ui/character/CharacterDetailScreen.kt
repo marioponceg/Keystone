@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,11 +30,13 @@ fun CharacterDetailScreen(
     onBack: () -> Unit,
     viewModel: CharacterDetailViewModel,
     showBackAction: Boolean = true,
+    isTabletop: Boolean = false,
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     CharacterDetailContent(
         state = state,
         showBackAction = showBackAction,
+        isTabletop = isTabletop,
         onEvent = { event ->
             when (event) {
                 CharacterDetailEvent.Back -> onBack()
@@ -48,6 +51,7 @@ fun CharacterDetailContent(
     state: CharacterDetailUiState,
     onEvent: (CharacterDetailEvent) -> Unit,
     showBackAction: Boolean = true,
+    isTabletop: Boolean = false,
 ) {
     Box(
         modifier = Modifier
@@ -62,7 +66,12 @@ fun CharacterDetailContent(
                 showBackAction = showBackAction,
             )
             is CharacterDetailUiState.Error -> ErrorState(onEvent = onEvent)
-            is CharacterDetailUiState.Content -> ContentState(profile = state.profile)
+            is CharacterDetailUiState.Content ->
+                if (isTabletop) {
+                    TabletopContentState(profile = state.profile)
+                } else {
+                    ContentState(profile = state.profile)
+                }
         }
     }
 }
@@ -147,6 +156,46 @@ private fun ContentState(profile: CharacterProfile) {
         }
         item {
             Spacer(modifier = Modifier.height(spacing.lg))
+        }
+    }
+}
+
+/**
+ * Tabletop split: identity and score occupy the top half (above the horizontal fold, facing the
+ * user) while the scrollable runs list takes the bottom half. A 50/50 split rather than a measured
+ * hinge offset — a half-open foldable folds at its midpoint, and hard-coding the ratio keeps this
+ * free of window-metrics plumbing that would not be testable in Robolectric anyway.
+ */
+@Composable
+private fun TabletopContentState(profile: CharacterProfile) {
+    val spacing = FoundryTheme.spacing
+    Column(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(horizontal = spacing.md),
+            verticalArrangement = Arrangement.spacedBy(spacing.md, Alignment.CenterVertically),
+        ) {
+            Header(profile = profile)
+            ScoreCard(score = profile.score)
+        }
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(horizontal = spacing.md),
+            verticalArrangement = Arrangement.spacedBy(spacing.md),
+        ) {
+            FoundryText(text = "Best runs", style = FoundryTextStyle.Heading)
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(spacing.md)) {
+                items(profile.bestRuns, key = { it.dungeonName }) { run ->
+                    DungeonRunCard(run = run)
+                }
+                item {
+                    Spacer(modifier = Modifier.height(spacing.lg))
+                }
+            }
         }
     }
 }
