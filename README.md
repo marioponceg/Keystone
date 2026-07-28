@@ -48,6 +48,7 @@ Three modules, clean-architecture layering:
 │  Compose UI (Foundry) · ViewModels (MVVM/UDF) · Navigation3     │
 │  Hilt DI · Quill setup (LogcatSink, QuillInterceptor)           │
 │  DataStore impl of RecentSearchesRepository/RegionPreference    │
+│  Adaptive layout (window size class, SceneStrategy, hinges)     │
 └────────────────────────────┬────────────────────────────────────┘
                              │ depends on
                              ▼
@@ -67,8 +68,8 @@ Three modules, clean-architecture layering:
 
 `core-domain` and `core-data` are pure Kotlin/JVM modules (possible for `core-data` because
 Conduit itself is JVM-pure), kept Android-free with a future KMP/iOS migration in mind. `app` is
-the only module that touches Android — Compose, Hilt, Navigation3 and the DataStore-backed repo
-implementations all live there.
+the only module that touches Android — Compose, Hilt, Navigation3, the adaptive layout logic and
+the DataStore-backed repo implementations all live there.
 
 Screens follow MVVM with strict unidirectional data flow: one immutable `UiState` per screen
 exposed as `StateFlow`, user events as a sealed interface, one-shot effects kept separate from
@@ -126,6 +127,9 @@ Future versions, not in scope for v0.2:
 
 - Crashlytics, including a `QuillSink` that forwards Quill events to it
 - Battle.net OAuth and the official Blizzard API, replacing the auth-free Raider.IO endpoints
+- Character avatars, loaded via Coil
+- Opening a run's page on Raider.IO in a Custom Tab, instead of only showing its stats in-app
+- Region-aware localization of affix descriptions, using the Raider.IO API's `locale` parameter
 
 ### On iOS
 
