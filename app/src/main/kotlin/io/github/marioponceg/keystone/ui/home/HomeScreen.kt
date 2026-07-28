@@ -3,14 +3,17 @@ package io.github.marioponceg.keystone.ui.home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -21,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.marioponceg.foundry.components.FoundryButton
@@ -50,14 +54,50 @@ fun HomeScreen(
     HomeContent(state = state, onEvent = viewModel::onEvent)
 }
 
+/**
+ * Below this width Home is a single scrolling column; at or above it, the search form and recents
+ * sit side by side under a full-width affixes card.
+ *
+ * Measured against the width this composable is *given*, not the window width: at expanded width
+ * Home renders inside a ~400dp list pane of a 1280dp window, and must stay single-column there.
+ */
+internal const val HOME_TWO_COLUMN_MIN_WIDTH_DP = 600
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeContent(state: HomeUiState, onEvent: (HomeEvent) -> Unit) {
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(FoundryTheme.colors.background),
+    ) {
+        if (maxWidth >= HOME_TWO_COLUMN_MIN_WIDTH_DP.dp) {
+            HomeTwoColumnContent(state = state, onEvent = onEvent)
+        } else {
+            HomeSingleColumnContent(state = state, onEvent = onEvent)
+        }
+    }
+    if (state.isRealmSheetVisible) {
+        ModalBottomSheet(
+            onDismissRequest = { onEvent(HomeEvent.RealmSheetDismissed) },
+            containerColor = FoundryTheme.colors.surface,
+        ) {
+            RealmPickerContent(
+                query = state.realmQuery,
+                results = state.realmResults,
+                onQueryChange = { onEvent(HomeEvent.RealmQueryChanged(it)) },
+                onRealmSelected = { onEvent(HomeEvent.RealmSelected(it)) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun HomeSingleColumnContent(state: HomeUiState, onEvent: (HomeEvent) -> Unit) {
     val spacing = FoundryTheme.spacing
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(FoundryTheme.colors.background)
             .padding(horizontal = spacing.md),
         verticalArrangement = Arrangement.spacedBy(spacing.md),
     ) {
@@ -78,29 +118,70 @@ fun HomeContent(state: HomeUiState, onEvent: (HomeEvent) -> Unit) {
             item {
                 FoundryText(text = "Recent searches", style = FoundryTextStyle.Heading)
             }
-            // Key must be Bundle-storable; CharacterId itself is not, so flatten it to a string.
-            items(
-                state.recentSearches,
-                key = { "${it.id.region.name}/${it.id.realm.slug}/${it.id.name}" },
-            ) { recent ->
-                RecentSearchRow(recent = recent, onEvent = onEvent)
-            }
+            recentSearchItems(recents = state.recentSearches, onEvent = onEvent)
         }
         item {
             Spacer(modifier = Modifier.height(spacing.lg))
         }
     }
-    if (state.isRealmSheetVisible) {
-        ModalBottomSheet(
-            onDismissRequest = { onEvent(HomeEvent.RealmSheetDismissed) },
-            containerColor = FoundryTheme.colors.surface,
+}
+
+/**
+ * Shared by both layouts so the key derivation lives in exactly one place.
+ *
+ * The key must be Bundle-storable and `CharacterId` is not, so it is flattened to a string.
+ */
+private fun LazyListScope.recentSearchItems(
+    recents: List<RecentSearch>,
+    onEvent: (HomeEvent) -> Unit,
+) {
+    items(recents, key = { "${it.id.region.name}/${it.id.realm.slug}/${it.id.name}" }) { recent ->
+        RecentSearchRow(recent = recent, onEvent = onEvent)
+    }
+}
+
+@Composable
+private fun HomeTwoColumnContent(state: HomeUiState, onEvent: (HomeEvent) -> Unit) {
+    val spacing = FoundryTheme.spacing
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = spacing.md),
+        verticalArrangement = Arrangement.spacedBy(spacing.md),
+    ) {
+        FoundryText(
+            text = "Keystone",
+            style = FoundryTextStyle.Display,
+            modifier = Modifier.padding(top = spacing.lg),
+        )
+        // Affixes span the full width: three affixes in a row is content that improves with width,
+        // unlike a text field, which does not.
+        AffixesCard(state = state.affixes, onRetry = { onEvent(HomeEvent.RetryAffixes) })
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(spacing.md),
         ) {
-            RealmPickerContent(
-                query = state.realmQuery,
-                results = state.realmResults,
-                onQueryChange = { onEvent(HomeEvent.RealmQueryChanged(it)) },
-                onRealmSelected = { onEvent(HomeEvent.RealmSelected(it)) },
-            )
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(spacing.md),
+            ) {
+                SearchForm(state = state, onEvent = onEvent)
+            }
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.spacedBy(spacing.md),
+            ) {
+                if (state.recentSearches.isNotEmpty()) {
+                    FoundryText(text = "Recent searches", style = FoundryTextStyle.Heading)
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(spacing.md),
+                    ) {
+                        recentSearchItems(recents = state.recentSearches, onEvent = onEvent)
+                    }
+                }
+            }
         }
     }
 }
