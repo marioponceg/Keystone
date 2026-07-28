@@ -32,6 +32,11 @@ no analytics.
 - **Weekly affixes** — a card on the home screen showing the current M+ affix rotation.
 - **Recent searches** — the last 10 lookups, deduplicated, saved only after a successful
   profile load (so a typo never pollutes the list), with per-item delete.
+- **Adaptive layout** — a two-pane list-detail layout at expanded width (tablet landscape,
+  desktop, ChromeOS), a two-column home at medium width, a pane split that aligns to a foldable's
+  hinge, and a tabletop layout for character detail on half-open foldables.
+- **Keyboard and pointer** — Enter submits a search, Esc closes the realm picker, the realm list
+  is navigable with arrow keys, and rows respond to hover.
 
 ## Architecture
 
@@ -72,9 +77,9 @@ and a Roborazzi screenshot test, light and dark.
 
 ## Screenshots
 
-| Home | Character detail |
-|---|---|
-| ![Home](app/src/test/screenshots/home_content_light.png) | ![Character detail](app/src/test/screenshots/character_detail_content_light.png) |
+| Home | Character detail | Two panes (expanded) |
+|---|---|---|
+| ![Home](app/src/test/screenshots/home_content_light.png) | ![Character detail](app/src/test/screenshots/character_detail_content_light.png) | ![Two panes](app/src/test/screenshots/shell_detail_light.png) |
 
 ## Tech stack
 
@@ -82,6 +87,9 @@ and a Roborazzi screenshot test, light and dark.
   pure-Kotlin/JVM modules (`core-domain`, `core-data`), Java 17 source/target on `app`
 - Jetpack Compose (BOM 2026.06) with the Foundry design system
 - Navigation3, Hilt, DataStore Preferences, kotlinx.serialization
+- Adaptive UI via Navigation3 `SceneStrategy` (`material3.adaptive:adaptive-navigation3`) — note
+  this artifact has no stable release yet, so its version is pinned explicitly rather than taken
+  from the Compose BOM
 - Conduit (networking) + Quill (logging) — see above
 - JUnit 5 for the pure-Kotlin modules, coroutines-test + Turbine for ViewModels, Robolectric +
   Roborazzi for screenshot tests
@@ -114,13 +122,18 @@ time only — the app itself calls only Raider.IO's documented v1 API.
 
 ## Roadmap
 
-Future versions, not in scope for v0.1:
+Future versions, not in scope for v0.2:
 
 - Crashlytics, including a `QuillSink` that forwards Quill events to it
 - Battle.net OAuth and the official Blizzard API, replacing the auth-free Raider.IO endpoints
-- Character avatars via Coil
-- Opening a run on raider.io directly from the app (Custom Tabs)
-- Affix localization
+
+### On iOS
+
+`core-domain` is already free of JVM-specific APIs and would convert to a Kotlin Multiplatform
+module cheaply. The blocker is not this repository: `core-data` depends on Conduit, which ships
+JVM-only with an OkHttp engine, and the `app` module would need Compose Multiplatform, which in
+turn needs a CMP build of Foundry and a KMP build of Quill. The order of work is therefore
+Conduit KMP → Quill KMP → Foundry CMP → Keystone iOS, and the first three do not live here.
 
 ## Design notes
 
