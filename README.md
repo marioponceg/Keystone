@@ -36,7 +36,7 @@ no analytics.
   desktop, ChromeOS), a two-column home at medium width, a pane split that aligns to a foldable's
   hinge, and a tabletop layout for character detail on half-open foldables.
 - **Keyboard and pointer** — Enter submits a search, Esc closes the realm picker, the realm list
-  is navigable with arrow keys, and rows respond to hover.
+  is navigable with arrow keys, and recent-search rows respond to hover.
 
 ## Architecture
 

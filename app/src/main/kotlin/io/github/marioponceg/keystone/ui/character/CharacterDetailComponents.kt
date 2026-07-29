@@ -1,9 +1,5 @@
 package io.github.marioponceg.keystone.ui.character
 
-import androidx.compose.foundation.border
-import androidx.compose.foundation.hoverable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,11 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import io.github.marioponceg.foundry.components.FoundryCard
 import io.github.marioponceg.foundry.components.FoundryText
 import io.github.marioponceg.foundry.components.FoundryTextStyle
@@ -87,27 +80,16 @@ private fun Role.label(): String = when (this) {
 }
 
 /**
- * Hover border matches the recents rows on Home, so pointer feedback is consistent app-wide. It
- * repeats [FoundryCard]'s own shape, since `border` would otherwise draw a rectangle.
+ * Deliberately inert to the pointer. A hover border was tried here for symmetry with the recents
+ * rows on Home, but those rows are clickable and this card is not: highlighting on hover promised
+ * an interaction that does not exist, which is worse than no feedback at all. Restore it only
+ * alongside an `onClick`.
  */
 @Composable
 internal fun DungeonRunCard(run: DungeonRun) {
     val spacing = FoundryTheme.spacing
     val colors = FoundryTheme.colors
-    val interactionSource = remember { MutableInteractionSource() }
-    val isHovered by interactionSource.collectIsHoveredAsState()
-    FoundryCard(
-        modifier = Modifier
-            .fillMaxWidth()
-            .hoverable(interactionSource)
-            .then(
-                if (isHovered) {
-                    Modifier.border(1.dp, colors.accent, FoundryTheme.shapes.lg)
-                } else {
-                    Modifier
-                },
-            ),
-    ) {
+    FoundryCard(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,

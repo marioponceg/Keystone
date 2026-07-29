@@ -2,6 +2,7 @@ package io.github.marioponceg.keystone.ui.adaptive
 
 import androidx.compose.material3.adaptive.Posture
 import androidx.window.core.layout.WindowSizeClass
+import androidx.window.core.layout.computeWindowSizeClass
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -11,7 +12,10 @@ class KeystoneWindowInfoTest {
 
     private fun infoFor(widthDp: Float, heightDp: Float = 900f, tabletop: Boolean = false) =
         keystoneWindowInfoOf(
-            windowSizeClass = WindowSizeClass.compute(widthDp, heightDp),
+            windowSizeClass = WindowSizeClass.BREAKPOINTS_V1.computeWindowSizeClass(
+                widthDp = widthDp,
+                heightDp = heightDp,
+            ),
             posture = Posture(isTabletop = tabletop),
         )
 

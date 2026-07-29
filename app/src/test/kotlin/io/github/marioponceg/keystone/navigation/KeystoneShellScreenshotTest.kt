@@ -13,6 +13,7 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.window.core.layout.WindowSizeClass
+import androidx.window.core.layout.computeWindowSizeClass
 import com.github.takahirom.roborazzi.captureRoboImage
 import io.github.marioponceg.foundry.tokens.FoundryTheme
 import io.github.marioponceg.keystone.ui.character.CharacterDetailContent
@@ -57,7 +58,10 @@ class KeystoneShellScreenshotTest {
         }
         val directive = calculatePaneScaffoldDirective(
             WindowAdaptiveInfo(
-                windowSizeClass = WindowSizeClass.compute(1280f, 900f),
+                windowSizeClass = WindowSizeClass.BREAKPOINTS_V1.computeWindowSizeClass(
+                    widthDp = 1280f,
+                    heightDp = 900f,
+                ),
                 windowPosture = Posture(),
             ),
         ).copy(horizontalPartitionSpacerSize = 0.dp)
@@ -129,7 +133,10 @@ class KeystoneShellScreenshotTest {
         )
         val directive = calculatePaneScaffoldDirective(
             WindowAdaptiveInfo(
-                windowSizeClass = WindowSizeClass.compute(1280f, 900f),
+                windowSizeClass = WindowSizeClass.BREAKPOINTS_V1.computeWindowSizeClass(
+                    widthDp = 1280f,
+                    heightDp = 900f,
+                ),
                 windowPosture = posture,
             ),
         ).copy(horizontalPartitionSpacerSize = 0.dp)

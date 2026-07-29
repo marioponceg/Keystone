@@ -90,6 +90,7 @@ internal const val HOME_TWO_COLUMN_MIN_HEIGHT_DP = 600
 
 internal const val TAG_NAME_FIELD = "home_name_field"
 internal const val TAG_REALM_LIST = "realm_picker_list"
+internal const val TAG_REALM_FILTER = "realm_picker_filter"
 
 @Composable
 fun HomeContent(
@@ -196,14 +197,19 @@ private fun HomeTwoColumnContent(state: HomeUiState, onEvent: (HomeEvent) -> Uni
             ) {
                 SearchForm(state = state, onEvent = onEvent)
             }
+            // The heading is unconditional so the column keeps its identity from first run: with
+            // the two-column layout chosen on window size alone, an empty recents list still owns
+            // half the window, and a blank half is the default first-run view without this.
             Column(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight(),
                 verticalArrangement = Arrangement.spacedBy(spacing.md),
             ) {
-                if (state.recentSearches.isNotEmpty()) {
-                    FoundryText(text = "Recent searches", style = FoundryTextStyle.Heading)
+                FoundryText(text = "Recent searches", style = FoundryTextStyle.Heading)
+                if (state.recentSearches.isEmpty()) {
+                    RecentSearchesEmpty(modifier = Modifier.weight(1f))
+                } else {
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(spacing.md),
                     ) {
