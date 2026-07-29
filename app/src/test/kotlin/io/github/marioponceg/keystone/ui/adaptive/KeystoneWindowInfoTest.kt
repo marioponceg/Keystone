@@ -20,31 +20,26 @@ class KeystoneWindowInfoTest {
         )
 
     @Test
-    fun phoneWidthIsNeitherMediumNorExpanded() {
-        val info = infoFor(widthDp = 411f)
-        assertFalse(info.isWidthAtLeastMedium)
-        assertFalse(info.isWidthAtLeastExpanded)
+    fun phoneWidthIsNotMedium() {
+        assertFalse(infoFor(widthDp = 411f).isWidthAtLeastMedium)
     }
 
     @Test
-    fun tabletPortraitIsMediumButNotExpanded() {
-        val info = infoFor(widthDp = 720f)
-        assertTrue(info.isWidthAtLeastMedium)
-        assertFalse(info.isWidthAtLeastExpanded)
+    fun tabletPortraitIsMedium() {
+        assertTrue(infoFor(widthDp = 720f).isWidthAtLeastMedium)
     }
 
     @Test
-    fun desktopWidthIsBothMediumAndExpanded() {
-        val info = infoFor(widthDp = 1280f)
-        assertTrue(info.isWidthAtLeastMedium)
-        assertTrue(info.isWidthAtLeastExpanded)
+    fun desktopWidthIsStillAtLeastMedium() {
+        // The property is "at least medium", not "exactly medium": a dialog stays the right
+        // component past the expanded breakpoint, so widths above it must not fall back to false.
+        assertTrue(infoFor(widthDp = 1280f).isWidthAtLeastMedium)
     }
 
     @Test
-    fun exactBreakpointsAreInclusive() {
+    fun theMediumBreakpointIsInclusive() {
         assertTrue(infoFor(widthDp = 600f).isWidthAtLeastMedium)
-        assertTrue(infoFor(widthDp = 840f).isWidthAtLeastExpanded)
-        assertFalse(infoFor(widthDp = 839f).isWidthAtLeastExpanded)
+        assertFalse(infoFor(widthDp = 599f).isWidthAtLeastMedium)
     }
 
     @Test
@@ -58,7 +53,6 @@ class KeystoneWindowInfoTest {
         assertEquals(
             KeystoneWindowInfo(
                 isWidthAtLeastMedium = false,
-                isWidthAtLeastExpanded = false,
                 isTabletop = false,
             ),
             KeystoneWindowInfo.Compact,
