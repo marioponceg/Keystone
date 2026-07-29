@@ -22,6 +22,11 @@ detekt = "1.23.8"
 kover = "0.9.1"
 robolectric = "4.16.1"
 roborazzi = "1.66.0"
+# Not managed by the Compose BOM: the BOM pins the adaptive group to 1.2.0, but
+# adaptive-navigation3 has no stable release and its newest version (1.3.0-rc01) declares a
+# strict [1.3.0-rc01] range on adaptive-navigation, which overrides those pins. Version is
+# therefore explicit here. Revisit when 1.3.0 goes stable.
+adaptiveNavigation3 = "1.3.0-rc01"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -60,6 +65,7 @@ roborazzi = { group = "io.github.takahirom.roborazzi", name = "roborazzi", versi
 roborazzi-compose = { group = "io.github.takahirom.roborazzi", name = "roborazzi-compose", version.ref = "roborazzi" }
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+androidx-adaptive-navigation3 = { group = "androidx.compose.material3.adaptive", name = "adaptive-navigation3", version.ref = "adaptiveNavigation3" }
 
 # Plugin artifacts consumed by build-logic convention plugins
 kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
