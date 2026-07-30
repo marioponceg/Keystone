@@ -39,7 +39,6 @@ class RealmPickerDialogScreenshotTest {
 
     private val expandedWindow = KeystoneWindowInfo(
         isWidthAtLeastMedium = true,
-        isWidthAtLeastExpanded = true,
         isTabletop = false,
     )
 

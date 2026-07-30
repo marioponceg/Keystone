@@ -38,6 +38,8 @@ fun KeystoneNavDisplay(backStack: NavBackStack<NavKey>) {
         calculatePaneScaffoldDirective(windowAdaptiveInfo)
             .copy(horizontalPartitionSpacerSize = 0.dp)
     }
+    // Still needed for the tabletop posture; the back affordance deliberately no longer comes from
+    // here. See below.
     val windowInfo = rememberKeystoneWindowInfo()
     KeystoneShell(
         backStack = backStack,
@@ -48,7 +50,12 @@ fun KeystoneNavDisplay(backStack: NavBackStack<NavKey>) {
         detailPane = { key, onBack ->
             CharacterDetailScreen(
                 onBack = onBack,
-                showBackAction = !windowInfo.isWidthAtLeastExpanded,
+                // Read off the same directive that decides the pane count, not off a second,
+                // independently derived view of the window. "Detail is the only pane" and "the
+                // user needs a way back to the list" are the same fact; deriving them separately
+                // left nothing enforcing that they agree, and a disagreement would put a Back
+                // button inside a two-pane layout where the list is already on screen.
+                showBackAction = directive.maxHorizontalPartitions == 1,
                 isTabletop = windowInfo.isTabletop,
                 viewModel = hiltViewModel<CharacterDetailViewModel, CharacterDetailViewModel.Factory>(
                     creationCallback = { factory -> factory.create(key) },

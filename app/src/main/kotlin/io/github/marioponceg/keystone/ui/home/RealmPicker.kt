@@ -20,6 +20,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -27,7 +28,7 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
@@ -60,7 +61,10 @@ fun RealmPickerContent(
     val listState = rememberLazyListState()
     // Reset on every new result list: index 2 of the old results means nothing in the new ones.
     // -1 is "nothing highlighted", so the picker opens with no row pre-selected.
-    val highlighted = remember(results) { mutableIntStateOf(-1) }
+    // Saveable, not merely remembered: a fold or a window drag-resize can still take the Activity
+    // down (configChanges covers the common cases, not process death), and losing the highlighted
+    // row mid-keyboard-navigation would silently undo the user's position in the list.
+    val highlighted = rememberSaveable(results) { mutableIntStateOf(-1) }
     val focusRequester = remember { FocusRequester() }
 
     LaunchedEffect(highlighted.intValue) {
@@ -71,7 +75,9 @@ fun RealmPickerContent(
 
     // The picker is opened by clicking the trigger, so focus stays on the trigger unless the picker
     // claims it — and Compose only routes key events to the focused node and its ancestors. Without
-    // this the whole keyboard contract below is unreachable for a real user.
+    // this the whole keyboard contract below is unreachable for a real user. Focus goes to the
+    // filter field rather than the container: with several hundred realms per region, typing to
+    // narrow the list is the picker's primary interaction, so it must work the moment it opens.
     LaunchedEffect(Unit) { focusRequester.requestFocus() }
 
     Column(
@@ -80,7 +86,6 @@ fun RealmPickerContent(
             .background(FoundryTheme.colors.surface) // Surface background for golden/preview fidelity.
             .padding(spacing.md)
             .testTag(TAG_REALM_LIST)
-            .focusRequester(focusRequester)
             .focusable()
             .realmListKeys(
                 results = results,
@@ -96,7 +101,10 @@ fun RealmPickerContent(
             onValueChange = onQueryChange,
             label = "Search realms",
             singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag(TAG_REALM_FILTER)
+                .focusRequester(focusRequester),
         )
         if (results.isEmpty()) {
             FoundryText(
@@ -142,7 +150,15 @@ private fun RealmResults(
  * factory so it stays out of [RealmPickerContent]'s body and off Compose's discouraged
  * `@Composable`-modifier path.
  *
- * The returned `Boolean` is consumption: `false` lets the event carry on to the platform.
+ * `onPreviewKeyEvent`, not `onKeyEvent`, and that is load-bearing rather than a style choice.
+ * `onKeyEvent` on an ancestor runs only *after* the focused descendant declines the event, and the
+ * focused descendant here is the `singleLine` filter field — which maps ↑/↓ to `KeyCommand.UP`/
+ * `DOWN` and Enter to `NEW_LINE` and consumes all three. Previewing lets the container claim those
+ * keys on the way down, in the one flow that matters: filtering a few hundred realms and then
+ * picking one without leaving the field. Keys the picker does not claim still reach the field
+ * untouched, so typing, Tab and text editing are unaffected.
+ *
+ * The returned `Boolean` is consumption: `false` lets the event carry on to the field/platform.
  *
  * [highlighted] is the state itself rather than its value on purpose: two keys can arrive between
  * recompositions (Down then Enter), and a captured `Int` would leave Enter reading the pre-Down
@@ -153,8 +169,8 @@ private fun Modifier.realmListKeys(
     highlighted: MutableIntState,
     onRealmSelected: (Realm) -> Unit,
     onDismiss: () -> Unit,
-): Modifier = onKeyEvent { event ->
-    val command = event.toRealmListCommand() ?: return@onKeyEvent false
+): Modifier = onPreviewKeyEvent { event ->
+    val command = event.toRealmListCommand() ?: return@onPreviewKeyEvent false
     val current = highlighted.intValue
     when (command) {
         RealmListCommand.Next -> {

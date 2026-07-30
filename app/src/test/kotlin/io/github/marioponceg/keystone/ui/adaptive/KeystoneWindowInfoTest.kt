@@ -2,6 +2,7 @@ package io.github.marioponceg.keystone.ui.adaptive
 
 import androidx.compose.material3.adaptive.Posture
 import androidx.window.core.layout.WindowSizeClass
+import androidx.window.core.layout.computeWindowSizeClass
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -11,36 +12,34 @@ class KeystoneWindowInfoTest {
 
     private fun infoFor(widthDp: Float, heightDp: Float = 900f, tabletop: Boolean = false) =
         keystoneWindowInfoOf(
-            windowSizeClass = WindowSizeClass.compute(widthDp, heightDp),
+            windowSizeClass = WindowSizeClass.BREAKPOINTS_V1.computeWindowSizeClass(
+                widthDp = widthDp,
+                heightDp = heightDp,
+            ),
             posture = Posture(isTabletop = tabletop),
         )
 
     @Test
-    fun phoneWidthIsNeitherMediumNorExpanded() {
-        val info = infoFor(widthDp = 411f)
-        assertFalse(info.isWidthAtLeastMedium)
-        assertFalse(info.isWidthAtLeastExpanded)
+    fun phoneWidthIsNotMedium() {
+        assertFalse(infoFor(widthDp = 411f).isWidthAtLeastMedium)
     }
 
     @Test
-    fun tabletPortraitIsMediumButNotExpanded() {
-        val info = infoFor(widthDp = 720f)
-        assertTrue(info.isWidthAtLeastMedium)
-        assertFalse(info.isWidthAtLeastExpanded)
+    fun tabletPortraitIsMedium() {
+        assertTrue(infoFor(widthDp = 720f).isWidthAtLeastMedium)
     }
 
     @Test
-    fun desktopWidthIsBothMediumAndExpanded() {
-        val info = infoFor(widthDp = 1280f)
-        assertTrue(info.isWidthAtLeastMedium)
-        assertTrue(info.isWidthAtLeastExpanded)
+    fun desktopWidthIsStillAtLeastMedium() {
+        // The property is "at least medium", not "exactly medium": a dialog stays the right
+        // component past the expanded breakpoint, so widths above it must not fall back to false.
+        assertTrue(infoFor(widthDp = 1280f).isWidthAtLeastMedium)
     }
 
     @Test
-    fun exactBreakpointsAreInclusive() {
+    fun theMediumBreakpointIsInclusive() {
         assertTrue(infoFor(widthDp = 600f).isWidthAtLeastMedium)
-        assertTrue(infoFor(widthDp = 840f).isWidthAtLeastExpanded)
-        assertFalse(infoFor(widthDp = 839f).isWidthAtLeastExpanded)
+        assertFalse(infoFor(widthDp = 599f).isWidthAtLeastMedium)
     }
 
     @Test
@@ -54,7 +53,6 @@ class KeystoneWindowInfoTest {
         assertEquals(
             KeystoneWindowInfo(
                 isWidthAtLeastMedium = false,
-                isWidthAtLeastExpanded = false,
                 isTabletop = false,
             ),
             KeystoneWindowInfo.Compact,

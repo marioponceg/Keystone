@@ -30,10 +30,13 @@ class HomeMediumScreenshotTest {
     // Index 1 is the Content state: affixes loaded, form filled, recents populated.
     private val contentState = HomeStateProvider().values.toList()[1]
 
-    private fun capture(name: String, darkTheme: Boolean) {
+    // Index 0 is the empty state — a fresh install, nothing searched yet.
+    private val emptyState = HomeStateProvider().values.toList()[0]
+
+    private fun capture(name: String, darkTheme: Boolean, state: HomeUiState = contentState) {
         composeRule.setContent {
             FoundryTheme(darkTheme = darkTheme) {
-                HomeContent(state = contentState, onEvent = {})
+                HomeContent(state = state, onEvent = {})
             }
         }
         composeRule.onRoot().captureRoboImage("src/test/screenshots/$name.png")
@@ -44,4 +47,18 @@ class HomeMediumScreenshotTest {
 
     @Test
     fun homeMediumDark() = capture("home_medium_content_dark", true)
+
+    /**
+     * First run at medium width, and a layout-axis case rather than a state-axis one: the
+     * two-column layout branches on whether recents are empty, so this captures a different
+     * arrangement, not merely a different state rendered the same way. Without it nothing guards
+     * the right column against going blank again.
+     */
+    @Test
+    fun homeMediumEmptyRecentsLight() =
+        capture("home_medium_empty_recents_light", false, emptyState)
+
+    @Test
+    fun homeMediumEmptyRecentsDark() =
+        capture("home_medium_empty_recents_dark", true, emptyState)
 }

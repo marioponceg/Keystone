@@ -15,8 +15,14 @@ import androidx.window.core.layout.WindowSizeClass
  * composable was actually given must use [androidx.compose.foundation.layout.BoxWithConstraints]
  * instead: at expanded width the window is ~1280dp while the home pane is ~400dp, so reacting to
  * window width inside a pane draws the wrong layout. This type carries only facts that are true of
- * the window regardless of which pane you are in — whether a dialog is appropriate, whether the
- * device is folded flat on a table, and whether a second pane exists.
+ * the window regardless of which pane you are in — whether a dialog is appropriate, and whether the
+ * device is folded flat on a table.
+ *
+ * "Is there a second pane?" deliberately does *not* live here. That fact belongs to the
+ * `PaneScaffoldDirective` that actually decides the pane count, and is read off its
+ * `maxHorizontalPartitions` — see `KeystoneNavDisplay`. A width breakpoint on this type would be a
+ * second, independently derived answer to the same question, agreeing with the directive only by
+ * coincidence.
  *
  * Window size never reaches a `UiState`: this is passed to composables, so ViewModels stay
  * width-agnostic.
@@ -24,14 +30,12 @@ import androidx.window.core.layout.WindowSizeClass
 @Immutable
 data class KeystoneWindowInfo(
     val isWidthAtLeastMedium: Boolean,
-    val isWidthAtLeastExpanded: Boolean,
     val isTabletop: Boolean,
 ) {
     companion object {
         /** Phone portrait. The default for previews and for the compact-only screenshot goldens. */
         val Compact = KeystoneWindowInfo(
             isWidthAtLeastMedium = false,
-            isWidthAtLeastExpanded = false,
             isTabletop = false,
         )
     }
@@ -46,7 +50,6 @@ fun keystoneWindowInfoOf(
     posture: Posture,
 ): KeystoneWindowInfo = KeystoneWindowInfo(
     isWidthAtLeastMedium = windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND),
-    isWidthAtLeastExpanded = windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND),
     isTabletop = posture.isTabletop,
 )
 

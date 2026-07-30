@@ -47,6 +47,20 @@ commit history, PRs, and code.
 - **Save-recents-on-success**: a recent search is saved only when the character profile loads
   successfully (not on submit), so typos never pollute the recents list.
 - **Never published**: the app is not published to Maven Central — no BCV, no maven-publish.
+- **v0.2 scope**: adaptive UI only, confined to the `app` module — `core-domain` and `core-data`
+  are not touched. Two-pane list-detail at expanded width via Navigation3 `SceneStrategy`
+  (never `ListDetailPaneScaffold`), a two-column home at medium width, hinge-aware pane splitting,
+  tabletop character detail, an adaptive realm picker, and keyboard/pointer support.
+- **Window size never enters `UiState`**: ViewModels stay width-agnostic. Layout that depends on
+  available space uses `BoxWithConstraints`; layout that depends on genuinely window-level facts
+  (dialog vs sheet, posture, pane count) takes a `KeystoneWindowInfo` parameter.
+- **Screenshot matrix is sparse by design**: the state axis (every `UiState` variant) is captured
+  at compact width only; the layout axis captures the representative `Content` state at each
+  window configuration. Do not multiply the two — a state does not break differently at 1280dp
+  than at 360dp.
+- **Experimental Compose APIs (`Grid`, `FlexBox`, `MediaQuery`) are not used**, though available in
+  Compose 1.11.4 — the layouts here need only `BoxWithConstraints`, `Row`/`Column` and
+  `hoverable`.
 
 Any design decision **not** listed above must be raised with the maintainer before implementing.
 
