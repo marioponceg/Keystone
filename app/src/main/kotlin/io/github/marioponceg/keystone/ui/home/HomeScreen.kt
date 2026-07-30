@@ -17,8 +17,6 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -39,6 +37,8 @@ import io.github.marioponceg.foundry.tokens.FoundryTheme
 import io.github.marioponceg.keystone.domain.model.CharacterId
 import io.github.marioponceg.keystone.domain.model.RecentSearch
 import io.github.marioponceg.keystone.domain.model.Region
+import io.github.marioponceg.keystone.ui.adaptive.KeystoneWindowInfo
+import io.github.marioponceg.keystone.ui.adaptive.rememberKeystoneWindowInfo
 
 @Composable
 fun HomeScreen(
@@ -53,7 +53,11 @@ fun HomeScreen(
             }
         }
     }
-    HomeContent(state = state, onEvent = viewModel::onEvent)
+    HomeContent(
+        state = state,
+        onEvent = viewModel::onEvent,
+        windowInfo = rememberKeystoneWindowInfo(),
+    )
 }
 
 /**
@@ -73,9 +77,12 @@ internal const val HOME_TWO_COLUMN_MIN_WIDTH_DP = 600
  */
 internal const val HOME_TWO_COLUMN_MIN_HEIGHT_DP = 600
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeContent(state: HomeUiState, onEvent: (HomeEvent) -> Unit) {
+fun HomeContent(
+    state: HomeUiState,
+    onEvent: (HomeEvent) -> Unit,
+    windowInfo: KeystoneWindowInfo = KeystoneWindowInfo.Compact,
+) {
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
@@ -90,17 +97,7 @@ fun HomeContent(state: HomeUiState, onEvent: (HomeEvent) -> Unit) {
         }
     }
     if (state.isRealmSheetVisible) {
-        ModalBottomSheet(
-            onDismissRequest = { onEvent(HomeEvent.RealmSheetDismissed) },
-            containerColor = FoundryTheme.colors.surface,
-        ) {
-            RealmPickerContent(
-                query = state.realmQuery,
-                results = state.realmResults,
-                onQueryChange = { onEvent(HomeEvent.RealmQueryChanged(it)) },
-                onRealmSelected = { onEvent(HomeEvent.RealmSelected(it)) },
-            )
-        }
+        RealmPickerContainer(state = state, onEvent = onEvent, windowInfo = windowInfo)
     }
 }
 
