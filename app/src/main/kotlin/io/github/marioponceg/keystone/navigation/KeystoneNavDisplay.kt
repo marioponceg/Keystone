@@ -49,6 +49,7 @@ fun KeystoneNavDisplay(backStack: NavBackStack<NavKey>) {
             CharacterDetailScreen(
                 onBack = onBack,
                 showBackAction = !windowInfo.isWidthAtLeastExpanded,
+                isTabletop = windowInfo.isTabletop,
                 viewModel = hiltViewModel<CharacterDetailViewModel, CharacterDetailViewModel.Factory>(
                     creationCallback = { factory -> factory.create(key) },
                 ),

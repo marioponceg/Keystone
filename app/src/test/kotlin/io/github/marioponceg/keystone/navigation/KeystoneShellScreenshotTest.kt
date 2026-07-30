@@ -1,10 +1,13 @@
 package io.github.marioponceg.keystone.navigation
 
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.HingeInfo
 import androidx.compose.material3.adaptive.Posture
 import androidx.compose.material3.adaptive.WindowAdaptiveInfo
 import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.dp
@@ -92,4 +95,70 @@ class KeystoneShellScreenshotTest {
 
     @Test
     fun shellPlaceholderDark() = capture("shell_placeholder_dark", true, withCharacter = false)
+
+    /**
+     * A book-style foldable held open flat: a separating vertical hinge down the middle of a
+     * 1280dp-wide window. Robolectric cannot produce a real FoldingFeature, so the posture is
+     * built by hand and fed through the directive — which is exactly the seam KeystoneShell
+     * exposes for this purpose.
+     */
+    @OptIn(ExperimentalMaterial3AdaptiveApi::class)
+    @Composable
+    private fun HingedShell() {
+        val backStack = rememberNavBackStack(HomeKey, selectedKey)
+        val density = LocalDensity.current
+        val hingeCentrePx = with(density) { 640.dp.toPx() }
+        val hingeHalfWidthPx = with(density) { 12.dp.toPx() }
+        val windowHeightPx = with(density) { 900.dp.toPx() }
+        val posture = Posture(
+            isTabletop = false,
+            hingeList = listOf(
+                HingeInfo(
+                    bounds = Rect(
+                        left = hingeCentrePx - hingeHalfWidthPx,
+                        top = 0f,
+                        right = hingeCentrePx + hingeHalfWidthPx,
+                        bottom = windowHeightPx,
+                    ),
+                    isFlat = true,
+                    isVertical = true,
+                    isSeparating = true,
+                    isOccluding = true,
+                ),
+            ),
+        )
+        val directive = calculatePaneScaffoldDirective(
+            WindowAdaptiveInfo(
+                windowSizeClass = WindowSizeClass.compute(1280f, 900f),
+                windowPosture = posture,
+            ),
+        ).copy(horizontalPartitionSpacerSize = 0.dp)
+        KeystoneShell(
+            backStack = backStack,
+            directive = directive,
+            homePane = { HomeContent(state = homeContentState, onEvent = {}) },
+            detailPane = { _, _ ->
+                CharacterDetailContent(
+                    state = detailContentState,
+                    onEvent = {},
+                    showBackAction = false,
+                )
+            },
+        )
+    }
+
+    private fun captureHinged(name: String, darkTheme: Boolean) {
+        composeRule.setContent {
+            FoundryTheme(darkTheme = darkTheme) {
+                HingedShell()
+            }
+        }
+        composeRule.onRoot().captureRoboImage("src/test/screenshots/$name.png")
+    }
+
+    @Test
+    fun shellHingedLight() = captureHinged("shell_hinged_light", false)
+
+    @Test
+    fun shellHingedDark() = captureHinged("shell_hinged_dark", true)
 }
