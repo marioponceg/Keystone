@@ -111,13 +111,23 @@ Keystone/
 
 - **Conventional Commits** for every commit: `feat:`, `fix:`, `chore:`, `docs:`, `test:`,
   `refactor:`, `ci:`, `build:` …
-- **Trunk-based workflow**: `main` is protected by a repository ruleset — PR required (no direct
-  pushes), force-pushes and deletion blocked, CI and PR-title checks must pass. All work happens
-  on short-lived feature branches (`feature/<topic>`) merged via PR.
+- **Trunk-based workflow**: all work happens on short-lived feature branches (`feature/<topic>`)
+  merged via PR. `main` is protected by the `main` ruleset, active since 2026-07-30 and covering
+  `~DEFAULT_BRANCH`:
+  - **PR required** — no direct pushes. Required approvals is **0**, deliberately: GitHub does not
+    let you approve your own PR, so any higher number would deadlock a solo maintainer.
+  - **Squash is the only permitted merge method**, enforced by the ruleset and, repository-wide, by
+    `allow_merge_commit: false` / `allow_rebase_merge: false`.
+  - **Force-pushes and deletion of `main` are blocked.**
+  - **Required checks**: `Build, test & lint` and `Conventional Commits title`. Not strict — a PR
+    need not be up to date with `main` to merge.
+  - **No bypass actors**, admins included. To land something the rules forbid, disable the ruleset
+    deliberately rather than routing around it.
 - **Small, reviewable PRs** — one design unit per PR, each including its own tests (screenshot
   tests for anything visual). PR descriptions explain the *why*.
 - **PRs are squash-merged.** The PR title becomes the commit on `main`, so it must follow
-  Conventional Commits — CI validates this (`.github/workflows/pr-title.yml`).
+  Conventional Commits — CI validates this (`.github/workflows/pr-title.yml`) and the ruleset
+  requires that check to pass.
 - **Stacked PRs** (a PR whose base is another feature branch, as multi-task plans produce): once
   the base PR is squash-merged, **rebase the stacked branch onto `main` and force-push with
   `--force-with-lease` before merging it**. GitHub retargets the stacked PR to `main` by itself —
@@ -127,3 +137,12 @@ Keystone/
   The rebase drops those already-upstream commits and restores the one-design-unit diff the PR is
   supposed to show. Merging a stacked PR whose base branch still exists writes the squash commit
   onto that branch instead of `main`; PRs #12 and #16 exist only to recover work lost that way.
+
+  The ruleset now enforces that rebase rather than merely documenting it. `ci.yml` triggers only on
+  PRs targeting `main`, so while a PR is still based on a feature branch its required
+  `Build, test & lint` check never runs at all — GitHub reports *"Expected — waiting for status to
+  be reported"* and blocks the merge. Retargeting alone does not start it either: that is an
+  `edited` event, which is not among the default `pull_request` types. The rebase force-push is what
+  fires `synchronize` and produces the check. So the sequence per stacked PR is: merge the base →
+  rebase onto `main` → force-push with `--force-with-lease` → **wait for CI** → merge. The v0.2
+  stack (#19–#25) went through this loop four times.
