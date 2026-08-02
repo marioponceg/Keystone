@@ -1,0 +1,29 @@
+.github/scripts/stack-rebase/test/rebase_test.sh
+  s_030cff4ba2f75f::t_3fd2bac99b3db7 1-81
+.github/scripts/stack-rebase/rebase.sh
+  s_29890e22fd2313::t_317c98716df37c 1-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "381f8b4afa598bd35d9fc73ec51d250986a85b73",
+  "prompts": {},
+  "sessions": {
+    "s_030cff4ba2f75f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dc31c84a-4efe-412d-8974-d7076e2a824a",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    },
+    "s_29890e22fd2313": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-add94d86d0e1d2b2a",
+        "model": "unknown"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    }
+  }
+}
