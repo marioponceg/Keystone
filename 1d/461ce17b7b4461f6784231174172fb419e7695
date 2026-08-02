@@ -1,0 +1,19 @@
+.github/scripts/stack-rebase/rebase.sh
+  s_5e6ed54c091d41::t_543d39b5c8e0cf 13-14,27-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "1d461ce17b7b4461f6784231174172fb419e7695",
+  "prompts": {},
+  "sessions": {
+    "s_5e6ed54c091d41": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ab6f870a40983e40b",
+        "model": "unknown"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    }
+  }
+}
