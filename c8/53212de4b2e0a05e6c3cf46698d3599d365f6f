@@ -1,0 +1,29 @@
+scripts/stack-rebase/rebase-stack.sh
+  s_75aabf28717c6f::t_183599ff44b6d6 2,4,9-18,51-91,97-105,115,118,136-140,164-167,182-186,195-198,203-247,270-279,286,290,295,298-299,303-304,308-311,313-322
+scripts/stack-rebase/test/rebase_stack_test.sh
+  s_627c4355007c5b::t_e15902f20f280a 6-8,117,124,148-160,180-182,185,190-194,196-216,232-235,239,254-256,261-272,275-287,291-296,298-299,302-304,307,311-313,316-317,319-322,326,336-350,367-370,411,415-418,421-422,424,427,431,433-502,519-520,523-525
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "c853212de4b2e0a05e6c3cf46698d3599d365f6f",
+  "prompts": {},
+  "sessions": {
+    "s_627c4355007c5b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a3e0b73525780a142",
+        "model": "unknown"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    },
+    "s_75aabf28717c6f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ae89279f6fd7085dd",
+        "model": "unknown"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    }
+  }
+}
