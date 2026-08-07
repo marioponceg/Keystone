@@ -1,0 +1,25 @@
+.github/workflows/ci.yml
+  s_030cff4ba2f75f::t_c5b1ff3196731b 24-31
+AGENTS.md
+  s_030cff4ba2f75f::t_5f3140c09f570e 149-164
+scripts/stack-rebase/test/graph_test.sh
+  s_030cff4ba2f75f::t_ffa208fa70df63 44
+scripts/stack-rebase/test/rebase_test.sh
+  s_030cff4ba2f75f::t_8bb630a367c7fa 40,78,108,135,149
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "a04e4f2aea0a242a2c730de4562574530b967ac0",
+  "prompts": {},
+  "sessions": {
+    "s_030cff4ba2f75f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dc31c84a-4efe-412d-8974-d7076e2a824a",
+        "model": "unknown"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    }
+  }
+}
