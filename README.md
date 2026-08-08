@@ -87,12 +87,18 @@ and a Roborazzi screenshot test, light and dark.
 |---|---|---|
 | ![Home](app/src/test/screenshots/home_content_light.png) | ![Character detail](app/src/test/screenshots/character_detail_content_light.png) | ![Two panes](app/src/test/screenshots/shell_detail_light.png) |
 
+A best-run card, expanded — the affixes that run was played under, the date, and the way out to
+its page on Raider.IO:
+
+![Expanded run](app/src/test/screenshots/dungeon_run_expanded_light.png)
+
 ## Tech stack
 
 - Kotlin 2.2, AGP 9.2 with built-in Kotlin (no `kotlin-android` plugin); JVM toolchain 21 on the
   pure-Kotlin/JVM modules (`core-domain`, `core-data`), Java 17 source/target on `app`
 - Jetpack Compose (BOM 2026.06) with the Foundry design system
-- Navigation3, Hilt, DataStore Preferences, kotlinx.serialization
+- Navigation3, Hilt, DataStore Preferences, kotlinx.serialization, Coil (remote images),
+  `androidx.browser` (Custom Tabs)
 - Adaptive UI via Navigation3 `SceneStrategy` (`material3.adaptive:adaptive-navigation3`) — note
   this artifact has no stable release yet, so its version is pinned explicitly rather than taken
   from the Compose BOM
