@@ -2,7 +2,6 @@ package io.github.marioponceg.keystone.ui.common
 
 import android.content.ActivityNotFoundException
 import android.content.Context
-import android.content.Intent
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
@@ -28,11 +27,6 @@ fun openInCustomTab(context: Context, url: String, toolbarColor: Int) {
                 .build(),
         )
         .build()
-    // The caller here is `KeystoneNavDisplay`, which is composed with an Activity context, so
-    // this flag is not strictly required in production. It is required in this Robolectric suite
-    // (an application context via `ApplicationProvider`), and it is harmless from an Activity, so
-    // it is applied unconditionally rather than only in tests.
-    intent.intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     try {
         intent.launchUrl(context, url.toUri())
     } catch (e: ActivityNotFoundException) {
