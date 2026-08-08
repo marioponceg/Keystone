@@ -1,0 +1,19 @@
+app/src/test/kotlin/io/github/marioponceg/keystone/ui/character/CharacterDetailExpansionTest.kt
+  s_d395e96909bae9::t_f36cfc659ca8b2 10,23,146-178
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "2157c113a796d3b4d5706fe721a58fae619bdb4b",
+  "prompts": {},
+  "sessions": {
+    "s_d395e96909bae9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ad7440079bffc0194",
+        "model": "unknown"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    }
+  }
+}
