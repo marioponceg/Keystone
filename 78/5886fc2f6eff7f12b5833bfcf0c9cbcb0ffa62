@@ -1,0 +1,21 @@
+README.md
+  s_450d6bb34033b0::t_77f8da2a7f5606 131
+app/src/test/kotlin/io/github/marioponceg/keystone/ui/common/CustomTabTest.kt
+  s_450d6bb34033b0::t_1b3daffab4739c 5,39-59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "785886fc2f6eff7f12b5833bfcf0c9cbcb0ffa62",
+  "prompts": {},
+  "sessions": {
+    "s_450d6bb34033b0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a53d363a6ee397224",
+        "model": "unknown"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    }
+  }
+}
