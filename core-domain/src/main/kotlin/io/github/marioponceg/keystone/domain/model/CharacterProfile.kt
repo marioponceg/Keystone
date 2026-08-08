@@ -9,6 +9,11 @@ data class CharacterProfile(
     val spec: String,
     val score: SeasonScore,
     val bestRuns: List<DungeonRun>,
+    /**
+     * Raider.IO's `thumbnail_url`, pointing at Blizzard's public render CDN. Null when the
+     * character has no rendered portrait — rare, but a missing avatar must not break the screen.
+     */
+    val avatarUrl: String? = null,
 )
 
 /** Season score with the display color Raider.IO assigns, plus the per-role breakdown. */

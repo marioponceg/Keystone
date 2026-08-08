@@ -41,6 +41,7 @@ fun CharacterProfileDto.toDomain(requested: CharacterId): CharacterProfile {
                 score = run.score,
             )
         },
+        avatarUrl = thumbnailUrl,
     )
 }
 

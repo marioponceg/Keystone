@@ -9,6 +9,7 @@ data class CharacterProfileDto(
     @SerialName("class") val characterClass: String,
     @SerialName("active_spec_name") val activeSpecName: String,
     val realm: String,
+    @SerialName("thumbnail_url") val thumbnailUrl: String? = null,
     @SerialName("mythic_plus_scores_by_season") val scoresBySeason: List<SeasonScoresDto> = emptyList(),
     @SerialName("mythic_plus_best_runs") val bestRuns: List<BestRunDto> = emptyList(),
 )
