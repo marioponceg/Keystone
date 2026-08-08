@@ -1,0 +1,33 @@
+core-data/src/test/kotlin/io/github/marioponceg/keystone/data/repository/AffixesRepositoryImplTest.kt
+  s_20ca37a3cce55d::t_d4777b234c7b1c 12,34,39,47
+core-domain/src/test/kotlin/io/github/marioponceg/keystone/domain/fake/Fakes.kt
+  s_20ca37a3cce55d::t_5c9730d8322c7c 4,12,29-30,32,37-44
+core-domain/src/test/kotlin/io/github/marioponceg/keystone/domain/usecase/UseCasesTest.kt
+  s_20ca37a3cce55d::t_cb56adbcc4fb45 6,10,33,35,38-53
+core-data/src/main/kotlin/io/github/marioponceg/keystone/data/remote/RaiderIoApi.kt
+  s_20ca37a3cce55d::t_4d30c5ada1e38c 8,27-28
+core-data/src/main/kotlin/io/github/marioponceg/keystone/data/repository/AffixesRepositoryImpl.kt
+  s_20ca37a3cce55d::t_c90d17fd3720c4 6,13-14
+core-domain/src/main/kotlin/io/github/marioponceg/keystone/domain/repository/AffixesRepository.kt
+  s_20ca37a3cce55d::t_c140874f8363ec 4,9
+core-domain/src/main/kotlin/io/github/marioponceg/keystone/domain/repository/AppLocaleProvider.kt
+  s_20ca37a3cce55d::t_281e5d5735fbe3 1-11
+core-domain/src/main/kotlin/io/github/marioponceg/keystone/domain/usecase/GetWeeklyAffixes.kt
+  s_20ca37a3cce55d::t_f07b11cf35de8b 7,9-18,20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "7db6a594c40f63e26506a3979a9b4bc9586d6e18",
+  "prompts": {},
+  "sessions": {
+    "s_20ca37a3cce55d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "174bf8a6-c053-48c3-8854-352b5f3d6c5a",
+        "model": "unknown"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    }
+  }
+}
