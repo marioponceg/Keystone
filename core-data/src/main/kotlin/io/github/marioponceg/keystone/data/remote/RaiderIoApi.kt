@@ -5,6 +5,7 @@ import io.github.marioponceg.conduit.get
 import io.github.marioponceg.conduit.result.ConduitResult
 import io.github.marioponceg.keystone.data.remote.dto.AffixesDto
 import io.github.marioponceg.keystone.data.remote.dto.CharacterProfileDto
+import io.github.marioponceg.keystone.domain.model.ApiLocale
 import io.github.marioponceg.keystone.domain.model.CharacterId
 import io.github.marioponceg.keystone.domain.model.Region
 import java.net.URLEncoder
@@ -23,8 +24,8 @@ class RaiderIoApi(private val client: ConduitClient) {
                 "&fields=${PROFILE_FIELDS.encodeQuery()}",
         )
 
-    suspend fun getWeeklyAffixes(region: Region): ConduitResult<AffixesDto> =
-        client.get("/api/v1/mythic-plus/affixes?region=${region.slug}&locale=en")
+    suspend fun getWeeklyAffixes(region: Region, locale: ApiLocale): ConduitResult<AffixesDto> =
+        client.get("/api/v1/mythic-plus/affixes?region=${region.slug}&locale=${locale.slug}")
 }
 
 private fun String.encodeQuery(): String =

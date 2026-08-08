@@ -3,9 +3,11 @@ package io.github.marioponceg.keystone.domain.usecase
 import io.github.marioponceg.keystone.domain.error.KeystoneError
 import io.github.marioponceg.keystone.domain.error.KeystoneResult
 import io.github.marioponceg.keystone.domain.fake.FakeAffixesRepository
+import io.github.marioponceg.keystone.domain.fake.FakeAppLocaleProvider
 import io.github.marioponceg.keystone.domain.fake.FakeCharacterRepository
 import io.github.marioponceg.keystone.domain.fake.FakeRecentSearchesRepository
 import io.github.marioponceg.keystone.domain.fake.FakeRegionPreferenceRepository
+import io.github.marioponceg.keystone.domain.model.ApiLocale
 import io.github.marioponceg.keystone.domain.model.CharacterId
 import io.github.marioponceg.keystone.domain.model.Realm
 import io.github.marioponceg.keystone.domain.model.RecentSearch
@@ -28,11 +30,27 @@ class UseCasesTest {
     }
 
     @Test
-    fun `GetWeeklyAffixes delegates to the repository`() = runTest {
+    fun `GetWeeklyAffixes delegates to the repository with the provider's locale`() = runTest {
         val repository = FakeAffixesRepository(KeystoneResult.Failure(KeystoneError.Network))
-        val result = GetWeeklyAffixes(repository)(Region.US)
+        val result = GetWeeklyAffixes(repository, FakeAppLocaleProvider(ApiLocale.ES))(Region.US)
         assertEquals(KeystoneResult.Failure(KeystoneError.Network), result)
         assertEquals(Region.US, repository.lastRegion)
+        assertEquals(ApiLocale.ES, repository.lastLocale)
+    }
+
+    @Test
+    fun `GetWeeklyAffixes re-reads the locale on every call so a language change is picked up`() = runTest {
+        val repository = FakeAffixesRepository(KeystoneResult.Failure(KeystoneError.Network))
+        val localeProvider = FakeAppLocaleProvider(ApiLocale.EN)
+        val useCase = GetWeeklyAffixes(repository, localeProvider)
+
+        useCase(Region.EU)
+        assertEquals(ApiLocale.EN, repository.lastLocale)
+
+        localeProvider.locale = ApiLocale.DE
+        useCase(Region.EU)
+        assertEquals(ApiLocale.DE, repository.lastLocale)
+        assertEquals(2, localeProvider.calls)
     }
 
     @Test
