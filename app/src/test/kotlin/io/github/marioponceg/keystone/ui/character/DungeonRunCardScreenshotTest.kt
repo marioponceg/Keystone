@@ -59,7 +59,7 @@ class DungeonRunCardScreenshotTest {
             FoundryTheme(darkTheme = darkTheme) {
                 WithFakeImages {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        DungeonRunCard(run = run, expanded = true, onToggle = {})
+                        DungeonRunCard(run = run, expanded = true, onToggle = {}, onOpenRun = {})
                     }
                 }
             }

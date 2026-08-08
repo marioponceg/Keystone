@@ -126,6 +126,14 @@ commit history, PRs, and code.
   goldens did not change when it was fixed. This is a structural limit of capturing composables
   rather than a gap in coverage: **verify inset and system-bar behaviour on a device or emulator,
   not in the golden suite.**
+- **The Custom Tab launch lives at the navigation edge.** `CharacterDetailScreen` takes
+  `onOpenRun: (String) -> Unit`; `KeystoneNavDisplay` supplies the implementation from
+  `ui/common/CustomTab.kt`. No screen composable touches `Context` or `Intent`, which is also why
+  no golden can accidentally start an Activity. A device with no browser is logged through Quill,
+  not surfaced — the app has no snackbar and this feature does not justify one.
+- **v0.4 scope**: run depth on the existing Raider.IO response — an expandable best-run card
+  (affixes, dungeon icon, completion date) and a Custom Tab to the run's page. No new request, no
+  new data source, no backend. Two sequential PRs off `main`, no stack.
 
 Any design decision **not** listed above must be raised with the maintainer before implementing.
 

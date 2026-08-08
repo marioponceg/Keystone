@@ -1,10 +1,13 @@
 package io.github.marioponceg.keystone.ui.character
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.height
 import io.github.marioponceg.foundry.tokens.FoundryTheme
+import io.github.marioponceg.keystone.domain.model.DungeonRun
 import io.github.marioponceg.keystone.ui.WithFakeImages
 import org.junit.After
 import org.junit.Before
@@ -16,6 +19,8 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import java.util.Locale
 import java.util.TimeZone
+import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.minutes
 
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -44,11 +49,15 @@ class CharacterDetailExpansionTest {
         TimeZone.setDefault(defaultZone)
     }
 
-    private fun setContent() {
+    private fun setContent(onOpenRun: (String) -> Unit = {}) {
         composeRule.setContent {
             FoundryTheme {
                 WithFakeImages {
-                    CharacterDetailContent(state = contentState, onEvent = {})
+                    CharacterDetailContent(
+                        state = contentState,
+                        onEvent = {},
+                        onOpenRun = onOpenRun,
+                    )
                 }
             }
         }
@@ -92,5 +101,79 @@ class CharacterDetailExpansionTest {
         composeRule.onNodeWithText("Ara-Kara, City of Echoes").performClick()
 
         composeRule.onNodeWithText("Apr 18, 2026").assertIsDisplayed()
+    }
+
+    @Test
+    fun `the link button reports the run's own url`() {
+        val opened = mutableListOf<String>()
+        setContent(onOpenRun = { opened += it })
+
+        composeRule.onNodeWithText("Ara-Kara, City of Echoes").performClick()
+        composeRule.onNodeWithText("View on Raider.IO").performClick()
+
+        assertEquals(listOf("https://raider.io/mythic-plus-runs/season-mn-1/14598027-12-ara-kara"), opened)
+    }
+
+    @Test
+    fun `a run with no url shows no link button`() {
+        setContent()
+
+        composeRule.onNodeWithText("City of Threads").performClick()
+
+        composeRule.onNodeWithText("View on Raider.IO").assertDoesNotExist()
+    }
+
+    // City of Threads has no date, no affixes and no url — the only run with nothing at all to
+    // show once expanded. Before this task, `ExpandedRunDetails` rendered an unconditional
+    // `Column` with top padding regardless of content, so this run grew a few dp on expansion for
+    // nothing. FoundryCard's onClick makes it a merged semantics node, so `onNodeWithText` here
+    // (the same query the other tests in this file already click through) resolves to the whole
+    // card, not just the label — its bounds capture the card's full height, panel included.
+    // Removing the "nothing to show" guard reintroduces the padding-only Column and grows that
+    // height on expansion, even though no visible text changes — a presence/absence check on text
+    // alone cannot catch that regression.
+    @Test
+    fun `a run with nothing to show adds no panel when expanded`() {
+        setContent()
+        val card = composeRule.onNodeWithText("City of Threads")
+        val collapsedHeight = card.getUnclippedBoundsInRoot().height
+
+        card.performClick()
+
+        val expandedHeight = card.getUnclippedBoundsInRoot().height
+        assertEquals(collapsedHeight, expandedHeight)
+    }
+
+    // Every fixture in CharacterDetailStateProvider either has a date or affixes alongside its
+    // url, or (City of Threads) has neither a url nor a date nor affixes. None of them isolates
+    // the `run.url == null` conjunct in ExpandedRunDetails' "nothing to show" guard: a run with a
+    // url but no date and no affixes. Rendered here directly against DungeonRunCard — not through
+    // CharacterDetailContent — with a locally built run, so this test pins that conjunct without
+    // adding a fourth run to the provider that ten golden images would have to re-record.
+    @Test
+    fun `a run with only a url still shows the link button when expanded`() {
+        val run = DungeonRun(
+            id = 1,
+            dungeonName = "Operation: Mechagon",
+            shortName = "MECH",
+            keystoneLevel = 10,
+            upgrades = 1,
+            clearTime = 25.minutes,
+            parTime = 30.minutes,
+            score = 300.0,
+            iconUrl = null,
+            completedAtEpochMillis = null,
+            affixes = emptyList(),
+            url = "https://raider.io/mythic-plus-runs/season-mn-1/1-10-mechagon",
+        )
+        composeRule.setContent {
+            FoundryTheme {
+                WithFakeImages {
+                    DungeonRunCard(run = run, expanded = true, onToggle = {}, onOpenRun = {})
+                }
+            }
+        }
+
+        composeRule.onNodeWithText("View on Raider.IO").assertIsDisplayed()
     }
 }

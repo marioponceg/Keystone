@@ -26,6 +26,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
+import io.github.marioponceg.foundry.components.FoundryButton
+import io.github.marioponceg.foundry.components.FoundryButtonStyle
 import io.github.marioponceg.foundry.components.FoundryCard
 import io.github.marioponceg.foundry.components.FoundryText
 import io.github.marioponceg.foundry.components.FoundryTextStyle
@@ -56,7 +58,12 @@ private val ICON_SHAPE = RoundedCornerShape(6.dp)
  * `rememberSaveable` rather than dying with the composable.
  */
 @Composable
-internal fun DungeonRunCard(run: DungeonRun, expanded: Boolean, onToggle: () -> Unit) {
+internal fun DungeonRunCard(
+    run: DungeonRun,
+    expanded: Boolean,
+    onToggle: () -> Unit,
+    onOpenRun: (String) -> Unit,
+) {
     val spacing = FoundryTheme.spacing
     val colors = FoundryTheme.colors
     val interactionSource = remember { MutableInteractionSource() }
@@ -97,7 +104,7 @@ internal fun DungeonRunCard(run: DungeonRun, expanded: Boolean, onToggle: () -> 
             RunStats(run = run, expanded = expanded)
         }
         if (expanded) {
-            ExpandedRunDetails(run = run)
+            ExpandedRunDetails(run = run, onOpenRun = onOpenRun)
         }
         Spacer(modifier = Modifier.height(spacing.xs))
     }
@@ -140,7 +147,10 @@ private fun RunStats(run: DungeonRun, expanded: Boolean) {
 }
 
 @Composable
-private fun ExpandedRunDetails(run: DungeonRun) {
+private fun ExpandedRunDetails(run: DungeonRun, onOpenRun: (String) -> Unit) {
+    // A run with no date, no affixes and no url has nothing to show once expanded: rendering the
+    // padded Column below anyway would grow the card a few dp for an empty panel.
+    if (run.completedAtEpochMillis == null && run.affixes.isEmpty() && run.url == null) return
     val spacing = FoundryTheme.spacing
     val colors = FoundryTheme.colors
     Column(
@@ -158,6 +168,13 @@ private fun ExpandedRunDetails(run: DungeonRun) {
         }
         run.affixes.forEach { affix ->
             AffixRow(affix = affix)
+        }
+        run.url?.let { url ->
+            FoundryButton(
+                text = "View on Raider.IO",
+                onClick = { onOpenRun(url) },
+                style = FoundryButtonStyle.Secondary,
+            )
         }
     }
 }

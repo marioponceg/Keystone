@@ -171,6 +171,7 @@ class CharacterProfileMapperTest {
                         "ability_racial_chillofnight.jpg",
                 ),
             ),
+            url = "https://raider.io/mythic-plus-runs/season-mn-1/14598027-14-magisters-terrace",
         )
         assertEquals(expectedRun, dto.bestRuns.first())
 
@@ -217,5 +218,26 @@ class CharacterProfileMapperTest {
             """{"name":"X","class":"Mage","active_spec_name":"Frost","realm":"Tarren Mill"}""",
         )
         assertNull(dto.toDomain(requested).avatarUrl)
+    }
+
+    @Test
+    fun `carries the run url through to the domain`() {
+        assertEquals(
+            "https://raider.io/mythic-plus-runs/season-mn-1/14598027-14-magisters-terrace",
+            decode().toDomain(requested).bestRuns.first().url,
+        )
+    }
+
+    @Test
+    fun `a run without a url maps to null rather than failing`() {
+        val dto = KeystoneJson.decodeFromString<CharacterProfileDto>(
+            """
+            {"name":"X","class":"Mage","active_spec_name":"Frost","realm":"Tarren Mill",
+             "mythic_plus_best_runs":[{"dungeon":"Neltharus","short_name":"NELT",
+             "mythic_level":10,"clear_time_ms":1000,"par_time_ms":2000,
+             "num_keystone_upgrades":1,"score":100.0,"keystone_run_id":42}]}
+            """.trimIndent(),
+        )
+        assertNull(dto.toDomain(requested).bestRuns.single().url)
     }
 }

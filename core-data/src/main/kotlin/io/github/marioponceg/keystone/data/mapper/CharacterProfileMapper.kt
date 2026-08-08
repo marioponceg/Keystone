@@ -48,6 +48,7 @@ fun CharacterProfileDto.toDomain(requested: CharacterId): CharacterProfile {
                 affixes = run.affixes.map { affix ->
                     RunAffix(name = affix.name, iconUrl = affix.iconUrl)
                 },
+                url = run.url,
             )
         },
         avatarUrl = thumbnailUrl,
