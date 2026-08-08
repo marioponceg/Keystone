@@ -20,7 +20,7 @@ android {
         minSdk = 26
         targetSdk = 37
         versionCode = 1
-        versionName = "0.3.0"
+        versionName = "0.4.0"
     }
     buildFeatures {
         compose = true
@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.androidx.adaptive.navigation3)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.browser)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.foundry.components)
     implementation(libs.coil.compose)

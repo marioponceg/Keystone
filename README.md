@@ -40,6 +40,8 @@ no analytics.
   is navigable with arrow keys, and recent-search rows respond to hover.
 - **Run detail on tap** — every best-run card carries its dungeon icon, and tapping one expands it
   in place to show the affixes it was played under and the date it was completed.
+- **Open a run on Raider.IO** — the expanded card links out to the run's own page in a themed
+  Custom Tab.
 
 ## Architecture
 
@@ -130,7 +132,6 @@ Future versions, not in scope for v0.3:
 
 - Crashlytics, including a `QuillSink` that forwards Quill events to it
 - Battle.net OAuth and the official Blizzard API, replacing the auth-free Raider.IO endpoints
-- Opening a run's page on Raider.IO in a Custom Tab, instead of only showing its stats in-app
 
 ### On iOS
 

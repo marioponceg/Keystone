@@ -8,6 +8,8 @@ import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -16,11 +18,13 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import io.github.marioponceg.foundry.tokens.FoundryTheme
 import io.github.marioponceg.keystone.domain.model.CharacterId
 import io.github.marioponceg.keystone.ui.adaptive.rememberKeystoneWindowInfo
 import io.github.marioponceg.keystone.ui.character.CharacterDetailPlaceholder
 import io.github.marioponceg.keystone.ui.character.CharacterDetailScreen
 import io.github.marioponceg.keystone.ui.character.CharacterDetailViewModel
+import io.github.marioponceg.keystone.ui.common.openInCustomTab
 import io.github.marioponceg.keystone.ui.home.HomeScreen
 
 /**
@@ -41,6 +45,8 @@ fun KeystoneNavDisplay(backStack: NavBackStack<NavKey>) {
     // Still needed for the tabletop posture; the back affordance deliberately no longer comes from
     // here. See below.
     val windowInfo = rememberKeystoneWindowInfo()
+    val context = LocalContext.current
+    val toolbarColor = FoundryTheme.colors.surface.toArgb()
     KeystoneShell(
         backStack = backStack,
         directive = directive,
@@ -50,9 +56,10 @@ fun KeystoneNavDisplay(backStack: NavBackStack<NavKey>) {
         detailPane = { key, onBack ->
             CharacterDetailScreen(
                 onBack = onBack,
-                // No-op for now: opening the run's page is Task 5's job (a Custom Tab launched
-                // from here, the only place in this composable tree allowed to touch Context).
-                onOpenRun = {},
+                // The screen takes a lambda, not a Context: keeping Intent construction here means
+                // no screen composable can reach the system, and screenshot tests cannot launch
+                // anything.
+                onOpenRun = { url -> openInCustomTab(context, url, toolbarColor) },
                 // Read off the same directive that decides the pane count, not off a second,
                 // independently derived view of the window. "Detail is the only pane" and "the
                 // user needs a way back to the list" are the same fact; deriving them separately
