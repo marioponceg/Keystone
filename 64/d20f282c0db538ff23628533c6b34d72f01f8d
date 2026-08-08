@@ -1,0 +1,21 @@
+core-domain/src/main/kotlin/io/github/marioponceg/keystone/domain/model/ApiLocale.kt
+  s_20ca37a3cce55d::t_71b6cf7bd0f13c 1-50
+core-domain/src/test/kotlin/io/github/marioponceg/keystone/domain/model/ApiLocaleTest.kt
+  s_20ca37a3cce55d::t_91fbb35d804c8d 1-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "64d20f282c0db538ff23628533c6b34d72f01f8d",
+  "prompts": {},
+  "sessions": {
+    "s_20ca37a3cce55d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "174bf8a6-c053-48c3-8854-352b5f3d6c5a",
+        "model": "unknown"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    }
+  }
+}
