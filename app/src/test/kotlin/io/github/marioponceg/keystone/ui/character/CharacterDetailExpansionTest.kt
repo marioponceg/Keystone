@@ -7,6 +7,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.height
 import io.github.marioponceg.foundry.tokens.FoundryTheme
+import io.github.marioponceg.keystone.domain.model.DungeonRun
 import io.github.marioponceg.keystone.ui.WithFakeImages
 import org.junit.After
 import org.junit.Before
@@ -19,6 +20,7 @@ import org.robolectric.annotation.GraphicsMode
 import java.util.Locale
 import java.util.TimeZone
 import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.minutes
 
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -140,5 +142,38 @@ class CharacterDetailExpansionTest {
 
         val expandedHeight = card.getUnclippedBoundsInRoot().height
         assertEquals(collapsedHeight, expandedHeight)
+    }
+
+    // Every fixture in CharacterDetailStateProvider either has a date or affixes alongside its
+    // url, or (City of Threads) has neither a url nor a date nor affixes. None of them isolates
+    // the `run.url == null` conjunct in ExpandedRunDetails' "nothing to show" guard: a run with a
+    // url but no date and no affixes. Rendered here directly against DungeonRunCard — not through
+    // CharacterDetailContent — with a locally built run, so this test pins that conjunct without
+    // adding a fourth run to the provider that ten golden images would have to re-record.
+    @Test
+    fun `a run with only a url still shows the link button when expanded`() {
+        val run = DungeonRun(
+            id = 1,
+            dungeonName = "Operation: Mechagon",
+            shortName = "MECH",
+            keystoneLevel = 10,
+            upgrades = 1,
+            clearTime = 25.minutes,
+            parTime = 30.minutes,
+            score = 300.0,
+            iconUrl = null,
+            completedAtEpochMillis = null,
+            affixes = emptyList(),
+            url = "https://raider.io/mythic-plus-runs/season-mn-1/1-10-mechagon",
+        )
+        composeRule.setContent {
+            FoundryTheme {
+                WithFakeImages {
+                    DungeonRunCard(run = run, expanded = true, onToggle = {}, onOpenRun = {})
+                }
+            }
+        }
+
+        composeRule.onNodeWithText("View on Raider.IO").assertIsDisplayed()
     }
 }
