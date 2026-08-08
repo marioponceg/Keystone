@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
@@ -24,6 +25,7 @@ import io.github.marioponceg.foundry.components.FoundryTextStyle
 import io.github.marioponceg.foundry.tokens.FoundryTheme
 import io.github.marioponceg.keystone.domain.model.CharacterId
 import io.github.marioponceg.keystone.domain.model.CharacterProfile
+import io.github.marioponceg.keystone.ui.common.safeDrawingContentPadding
 
 @Composable
 fun CharacterDetailScreen(
@@ -93,6 +95,8 @@ private fun NotFoundState(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            // The Back button below must stay clear of the navigation bar to remain tappable.
+            .safeDrawingPadding()
             .padding(spacing.md),
         verticalArrangement = Arrangement.spacedBy(spacing.sm, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -120,6 +124,7 @@ private fun ErrorState(onEvent: (CharacterDetailEvent) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .safeDrawingPadding()
             .padding(spacing.md),
         verticalArrangement = Arrangement.spacedBy(spacing.sm, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -137,9 +142,8 @@ private fun ErrorState(onEvent: (CharacterDetailEvent) -> Unit) {
 private fun ContentState(profile: CharacterProfile) {
     val spacing = FoundryTheme.spacing
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = spacing.md),
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = safeDrawingContentPadding(horizontal = spacing.md),
         verticalArrangement = Arrangement.spacedBy(spacing.md),
     ) {
         item {
@@ -169,7 +173,7 @@ private fun ContentState(profile: CharacterProfile) {
 @Composable
 private fun TabletopContentState(profile: CharacterProfile) {
     val spacing = FoundryTheme.spacing
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize().safeDrawingPadding()) {
         Column(
             modifier = Modifier
                 .weight(1f)

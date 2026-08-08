@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
@@ -50,6 +51,7 @@ import io.github.marioponceg.keystone.domain.model.RecentSearch
 import io.github.marioponceg.keystone.domain.model.Region
 import io.github.marioponceg.keystone.ui.adaptive.KeystoneWindowInfo
 import io.github.marioponceg.keystone.ui.adaptive.rememberKeystoneWindowInfo
+import io.github.marioponceg.keystone.ui.common.safeDrawingContentPadding
 
 @Composable
 fun HomeScreen(
@@ -120,9 +122,8 @@ fun HomeContent(
 private fun HomeSingleColumnContent(state: HomeUiState, onEvent: (HomeEvent) -> Unit) {
     val spacing = FoundryTheme.spacing
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = spacing.md),
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = safeDrawingContentPadding(horizontal = spacing.md),
         verticalArrangement = Arrangement.spacedBy(spacing.md),
     ) {
         item {
@@ -170,6 +171,9 @@ private fun HomeTwoColumnContent(state: HomeUiState, onEvent: (HomeEvent) -> Uni
     Column(
         modifier = Modifier
             .fillMaxSize()
+            // Not a scrolling root, so the safe area is applied directly here; the inner recents
+            // list is already bounded by this and must not add the insets a second time.
+            .safeDrawingPadding()
             .padding(horizontal = spacing.md),
         verticalArrangement = Arrangement.spacedBy(spacing.md),
     ) {

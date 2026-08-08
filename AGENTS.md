@@ -91,6 +91,22 @@ commit history, PRs, and code.
   would otherwise draw nothing in a `@Preview`. Any screenshot test whose composable can reach an
   `AsyncImage` must be wrapped in it.
 
+- **Edge to edge with insets applied per screen**: `MainActivity` calls `enableEdgeToEdge()`, so the
+  app draws behind the system bars and every screen is responsible for its own safe area. Scrolling
+  containers take it through `contentPadding` (see `safeDrawingContentPadding`), never through a
+  padding modifier on the list — padding the container clips it to the safe area, so rows can no
+  longer travel behind the bars, which is the point of drawing edge to edge. Non-scrolling roots use
+  `Modifier.safeDrawingPadding()`. **Never** apply either to the adaptive scaffold itself: it does
+  not propagate `PaddingValues` to its panes, and padding the parent clips the whole edge-to-edge
+  layout. From v0.1 to v0.3 `enableEdgeToEdge()` was called and *no* screen applied insets, so
+  content drew under the status bar the whole time.
+- **Screenshot tests cannot catch inset bugs**: the Roborazzi tests capture `HomeContent` and
+  `CharacterDetailContent` as isolated composables, not the Activity, and Robolectric reports zero
+  window insets. The status-bar overlap above survived three versions and every golden, and the
+  goldens did not change when it was fixed. This is a structural limit of capturing composables
+  rather than a gap in coverage: **verify inset and system-bar behaviour on a device or emulator,
+  not in the golden suite.**
+
 Any design decision **not** listed above must be raised with the maintainer before implementing.
 
 ## Module structure
