@@ -50,7 +50,7 @@ private val ICON_SHAPE = RoundedCornerShape(6.dp)
  * highlighting something inert promises an interaction that does not exist — the condition that
  * KDoc set for restoring it ("only alongside an `onClick`") is now met.
  *
- * Stateless on purpose: `CharacterDetailContent` owns which run is open, so a screenshot test can
+ * Stateless on purpose: the layout body owns which run is open, so a screenshot test can
  * capture the expanded card without driving a click, and the choice survives rotation in a
  * `rememberSaveable` rather than dying with the composable.
  */

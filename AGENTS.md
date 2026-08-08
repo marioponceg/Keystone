@@ -95,8 +95,11 @@ commit history, PRs, and code.
   description the app has no localized use for. One type would make half the fields nullable on
   both sides.
 - **Expansion state is not in `UiState`.** Which run is open is pure UI state, like the realm
-  picker's highlighted index: it lives in a `rememberSaveable` in `CharacterDetailContent`, and
-  `DungeonRunCard` is stateless so a golden can capture the expanded card without a click.
+  picker's highlighted index: it lives in a `rememberSaveable` inside each layout body
+  (`ContentState` and `TabletopContentState`), and `DungeonRunCard` is stateless so a golden can
+  capture the expanded card without a click. The two layouts therefore hold the choice
+  independently — folding a device into tabletop with a run open collapses it, which is accepted:
+  the alternative is hoisting state across a layout switch that recomposes from scratch anyway.
 - **Coil is capped by the Kotlin version**: 3.4.0 depends on `kotlin-stdlib` 2.3.10 and 3.5.0 on
   2.4.0, whose metadata the project's Kotlin 2.2.10 compiler cannot read — `build` fails outright.
   3.3.0 is the newest release built against 2.2.x. Bump it together with Kotlin, which tracks AGP.

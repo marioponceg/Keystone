@@ -38,8 +38,8 @@ no analytics.
   hinge, and a tabletop layout for character detail on half-open foldables.
 - **Keyboard and pointer** — Enter submits a search, Esc closes the realm picker, the realm list
   is navigable with arrow keys, and recent-search rows respond to hover.
-- **Run detail on tap** — a best-run card expands in place to show the affixes it was played
-  under, the dungeon icon and the date it was completed.
+- **Run detail on tap** — every best-run card carries its dungeon icon, and tapping one expands it
+  in place to show the affixes it was played under and the date it was completed.
 
 ## Architecture
 
