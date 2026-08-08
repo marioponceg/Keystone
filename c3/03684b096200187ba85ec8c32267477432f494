@@ -1,0 +1,31 @@
+app/src/main/kotlin/io/github/marioponceg/keystone/ui/character/CharacterDetailPreviewParameters.kt
+  s_0e150725e65415::t_ffe591c0a07fb7 48-51,61-64,74-77
+core-data/src/main/kotlin/io/github/marioponceg/keystone/data/mapper/CharacterProfileMapper.kt
+  s_0e150725e65415::t_c3b283f356d560 10,12-13,38,46-50,59-69
+core-data/src/main/kotlin/io/github/marioponceg/keystone/data/remote/dto/CharacterProfileDto.kt
+  s_0e150725e65415::t_f0519e8b1cc23e 46-59
+core-data/src/test/kotlin/io/github/marioponceg/keystone/data/mapper/CharacterProfileMapperTest.kt
+  s_0e150725e65415::t_1a66df577e705c 7,77-132,153-173
+core-domain/src/main/kotlin/io/github/marioponceg/keystone/domain/model/DungeonRun.kt
+  s_0e150725e65415::t_f52d61f2d0b0f1 5-12,14,22-24
+core-domain/src/main/kotlin/io/github/marioponceg/keystone/domain/model/RunAffix.kt
+  s_0e150725e65415::t_1faacb34697c37 1-15
+core-domain/src/test/kotlin/io/github/marioponceg/keystone/domain/model/DungeonRunTest.kt
+  s_0e150725e65415::t_95cab014783258 19-22,37-40,55-58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "c303684b096200187ba85ec8c32267477432f494",
+  "prompts": {},
+  "sessions": {
+    "s_0e150725e65415": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a2a5ec1061db7df77",
+        "model": "unknown"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    }
+  }
+}
