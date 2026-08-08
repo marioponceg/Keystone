@@ -43,4 +43,18 @@ data class BestRunDto(
     @SerialName("par_time_ms") val parTimeMs: Long,
     @SerialName("num_keystone_upgrades") val numKeystoneUpgrades: Int,
     val score: Double,
+    // Run identity, so it is required exactly like `dungeon` and `mythic_level`. A default would
+    // have to fabricate a key, and a fabricated key is worse than a loud failure.
+    @SerialName("keystone_run_id") val keystoneRunId: Long,
+    // Optional with defaults, the same treatment `thumbnail_url` gets: a missing one degrades to
+    // "not shown" instead of failing the whole profile.
+    @SerialName("icon_url") val iconUrl: String? = null,
+    @SerialName("completed_at") val completedAt: String? = null,
+    val affixes: List<RunAffixDto> = emptyList(),
+)
+
+@Serializable
+data class RunAffixDto(
+    val name: String,
+    @SerialName("icon_url") val iconUrl: String? = null,
 )

@@ -45,6 +45,10 @@ class CharacterDetailStateProvider : PreviewParameterProvider<CharacterDetailUiS
                 clearTime = 24.minutes + 10.seconds,
                 parTime = 30.minutes,
                 score = 320.5,
+                id = 1L,
+                iconUrl = null,
+                completedAtEpochMillis = null,
+                affixes = emptyList(),
             ),
             DungeonRun(
                 dungeonName = "The Stonevault",
@@ -54,6 +58,10 @@ class CharacterDetailStateProvider : PreviewParameterProvider<CharacterDetailUiS
                 clearTime = 29.minutes + 45.seconds,
                 parTime = 30.minutes,
                 score = 285.0,
+                id = 2L,
+                iconUrl = null,
+                completedAtEpochMillis = null,
+                affixes = emptyList(),
             ),
             DungeonRun(
                 dungeonName = "City of Threads",
@@ -63,6 +71,10 @@ class CharacterDetailStateProvider : PreviewParameterProvider<CharacterDetailUiS
                 clearTime = 33.minutes,
                 parTime = 30.minutes,
                 score = 250.2,
+                id = 3L,
+                iconUrl = null,
+                completedAtEpochMillis = null,
+                affixes = emptyList(),
             ),
         ),
     )

@@ -4,6 +4,7 @@ import io.github.marioponceg.keystone.data.fixture
 import io.github.marioponceg.keystone.data.remote.KeystoneJson
 import io.github.marioponceg.keystone.data.remote.dto.BestRunDto
 import io.github.marioponceg.keystone.data.remote.dto.CharacterProfileDto
+import io.github.marioponceg.keystone.data.remote.dto.RunAffixDto
 import io.github.marioponceg.keystone.data.remote.dto.SeasonScoresDto
 import io.github.marioponceg.keystone.data.remote.dto.SegmentDto
 import io.github.marioponceg.keystone.data.remote.dto.SegmentsDto
@@ -74,6 +75,62 @@ class CharacterProfileMapperTest {
     }
 
     @Test
+    fun `maps the run id, icon and completion timestamp`() {
+        val run = decode().toDomain(requested).bestRuns.first()
+        assertEquals(14598027L, run.id)
+        assertEquals(
+            "https://cdn.raiderio.net/images/wow/icons/large/inv_achievement_dungeon_magistersterrace.jpg",
+            run.iconUrl,
+        )
+        // 2026-04-18T20:19:16.000Z
+        assertEquals(1776543556000L, run.completedAtEpochMillis)
+    }
+
+    @Test
+    fun `maps the run affixes in payload order with their icons`() {
+        val affixes = decode().toDomain(requested).bestRuns.first().affixes
+        assertEquals(
+            listOf("Tyrannical", "Fortified", "Xal'atath's Guile"),
+            affixes.map { it.name },
+        )
+        assertEquals(
+            "https://cdn.raiderio.net/images/wow/icons/large/achievement_boss_archaedas.jpg",
+            affixes.first().iconUrl,
+        )
+    }
+
+    @Test
+    fun `a run without optional fields maps to nulls and an empty affix list`() {
+        val dto = KeystoneJson.decodeFromString<CharacterProfileDto>(
+            """
+            {"name":"X","class":"Mage","active_spec_name":"Frost","realm":"Tarren Mill",
+             "mythic_plus_best_runs":[{"dungeon":"Neltharus","short_name":"NELT",
+             "mythic_level":10,"clear_time_ms":1000,"par_time_ms":2000,
+             "num_keystone_upgrades":1,"score":100.0,"keystone_run_id":42}]}
+            """.trimIndent(),
+        )
+        val run = dto.toDomain(requested).bestRuns.single()
+        assertEquals(42L, run.id)
+        assertNull(run.iconUrl)
+        assertNull(run.completedAtEpochMillis)
+        assertTrue(run.affixes.isEmpty())
+    }
+
+    @Test
+    fun `a malformed completion timestamp maps to null instead of throwing`() {
+        val dto = KeystoneJson.decodeFromString<CharacterProfileDto>(
+            """
+            {"name":"X","class":"Mage","active_spec_name":"Frost","realm":"Tarren Mill",
+             "mythic_plus_best_runs":[{"dungeon":"Neltharus","short_name":"NELT",
+             "mythic_level":10,"clear_time_ms":1000,"par_time_ms":2000,
+             "num_keystone_upgrades":1,"score":100.0,"keystone_run_id":42,
+             "completed_at":"last tuesday"}]}
+            """.trimIndent(),
+        )
+        assertNull(dto.toDomain(requested).bestRuns.single().completedAtEpochMillis)
+    }
+
+    @Test
     fun `dto round-trips through the shared Json config`() {
         val dto = decode()
         val reencoded = KeystoneJson.decodeFromString<CharacterProfileDto>(
@@ -93,6 +150,27 @@ class CharacterProfileMapperTest {
             parTimeMs = 2040999,
             numKeystoneUpgrades = 1,
             score = 400.1,
+            keystoneRunId = 14598027,
+            iconUrl = "https://cdn.raiderio.net/images/wow/icons/large/" +
+                "inv_achievement_dungeon_magistersterrace.jpg",
+            completedAt = "2026-04-18T20:19:16.000Z",
+            affixes = listOf(
+                RunAffixDto(
+                    name = "Tyrannical",
+                    iconUrl = "https://cdn.raiderio.net/images/wow/icons/large/" +
+                        "achievement_boss_archaedas.jpg",
+                ),
+                RunAffixDto(
+                    name = "Fortified",
+                    iconUrl = "https://cdn.raiderio.net/images/wow/icons/large/" +
+                        "ability_toughness.jpg",
+                ),
+                RunAffixDto(
+                    name = "Xal'atath's Guile",
+                    iconUrl = "https://cdn.raiderio.net/images/wow/icons/large/" +
+                        "ability_racial_chillofnight.jpg",
+                ),
+            ),
         )
         assertEquals(expectedRun, dto.bestRuns.first())
 
