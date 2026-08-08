@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
@@ -106,6 +107,7 @@ internal fun DungeonRunCard(run: DungeonRun, expanded: Boolean, onToggle: () -> 
 @Composable
 private fun RunStats(run: DungeonRun, expanded: Boolean) {
     val colors = FoundryTheme.colors
+    val spacing = FoundryTheme.spacing
     Column(horizontalAlignment = Alignment.End) {
         val filledStars = "★".repeat(run.upgrades)
         val emptyStars = "☆".repeat((MAX_UPGRADES - run.upgrades).coerceAtLeast(0))
@@ -119,10 +121,21 @@ private fun RunStats(run: DungeonRun, expanded: Boolean) {
             style = FoundryTextStyle.Caption,
             color = colors.onSurfaceMuted,
         )
-        FoundryText(
-            text = "%.1f".format(Locale.US, run.score) + if (expanded) "  ⌃" else "  ⌄",
-            style = FoundryTextStyle.Label,
-        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(spacing.xs),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            FoundryText(
+                text = "%.1f".format(Locale.US, run.score),
+                style = FoundryTextStyle.Label,
+            )
+            // Decorative: the card's stateDescription already announces "Expanded"/"Collapsed".
+            FoundryText(
+                text = if (expanded) "⌃" else "⌄",
+                style = FoundryTextStyle.Label,
+                modifier = Modifier.clearAndSetSemantics {},
+            )
+        }
     }
 }
 
