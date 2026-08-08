@@ -19,6 +19,7 @@ import io.github.marioponceg.keystone.domain.model.DungeonRun
 import io.github.marioponceg.keystone.domain.model.Role
 import io.github.marioponceg.keystone.domain.model.RoleScore
 import io.github.marioponceg.keystone.domain.model.SeasonScore
+import io.github.marioponceg.keystone.ui.common.CharacterAvatar
 import io.github.marioponceg.keystone.ui.common.WowClassColors
 import io.github.marioponceg.keystone.ui.common.parseScoreColor
 import java.util.Locale
@@ -26,17 +27,29 @@ import kotlin.time.Duration
 
 @Composable
 internal fun Header(profile: CharacterProfile, modifier: Modifier = Modifier) {
-    Column(modifier = modifier) {
-        FoundryText(
-            text = profile.name,
-            style = FoundryTextStyle.Display,
-            color = WowClassColors.forClass(profile.characterClass, FoundryTheme.colors.onBackground),
+    val spacing = FoundryTheme.spacing
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(spacing.md),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        CharacterAvatar(
+            url = profile.avatarUrl,
+            characterClass = profile.characterClass,
+            characterName = profile.name,
         )
-        FoundryText(
-            text = "${profile.spec} ${profile.characterClass} — ${profile.realm} (${profile.id.region.name})",
-            style = FoundryTextStyle.Body,
-            color = FoundryTheme.colors.onSurfaceMuted,
-        )
+        Column {
+            FoundryText(
+                text = profile.name,
+                style = FoundryTextStyle.Display,
+                color = WowClassColors.forClass(profile.characterClass, FoundryTheme.colors.onBackground),
+            )
+            FoundryText(
+                text = "${profile.spec} ${profile.characterClass} — ${profile.realm} (${profile.id.region.name})",
+                style = FoundryTextStyle.Body,
+                color = FoundryTheme.colors.onSurfaceMuted,
+            )
+        }
     }
 }
 

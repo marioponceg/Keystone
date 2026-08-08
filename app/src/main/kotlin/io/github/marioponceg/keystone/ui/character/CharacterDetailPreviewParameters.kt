@@ -25,6 +25,9 @@ class CharacterDetailStateProvider : PreviewParameterProvider<CharacterDetailUiS
         realm = "Tarren Mill",
         characterClass = "Druid",
         spec = "Feral",
+        // Never fetched: previews go through LocalAsyncImagePreviewHandler and screenshot tests
+        // through the fake loader installed by WithFakeImages.
+        avatarUrl = "https://render.worldofwarcraft.com/eu/character/tarren-mill/119/preview-avatar.jpg",
         score = SeasonScore(
             overall = 3500.0,
             colorHex = "#ff8000",
