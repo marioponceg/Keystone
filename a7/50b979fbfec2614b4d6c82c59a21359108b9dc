@@ -1,0 +1,31 @@
+AGENTS.md
+  s_f4b5581bf47cb4::t_7ac4c05e0e10d0 83-99
+README.md
+  s_f4b5581bf47cb4::t_5adac48970da1f 41-42
+app/src/main/kotlin/io/github/marioponceg/keystone/ui/character/CharacterDetailPreviewParameters.kt
+  s_f4b5581bf47cb4::t_1a1cc8110af405 13,42,50-56,59,67-73,76,84
+app/src/main/kotlin/io/github/marioponceg/keystone/ui/character/CharacterDetailScreen.kt
+  s_f4b5581bf47cb4::t_58289342d4acc2 17-19,147,162-167,184,205-210
+app/src/main/kotlin/io/github/marioponceg/keystone/ui/character/DungeonRunCard.kt
+  s_f4b5581bf47cb4::t_55cc31dcc8be77 3-7,14-16,18-19,22-27,33-37,41-44,46-55,58,61-77,82-94,96-99,105-202
+app/src/test/kotlin/io/github/marioponceg/keystone/ui/character/CharacterDetailExpansionTest.kt
+  s_f4b5581bf47cb4::t_1e092524f71f2b 1-96
+app/src/test/kotlin/io/github/marioponceg/keystone/ui/character/DungeonRunCardScreenshotTest.kt
+  s_f4b5581bf47cb4::t_4b9e1d7edbd581 1-75
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "a750b979fbfec2614b4d6c82c59a21359108b9dc",
+  "prompts": {},
+  "sessions": {
+    "s_f4b5581bf47cb4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a2accfc15a0ff5e09",
+        "model": "unknown"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    }
+  }
+}
