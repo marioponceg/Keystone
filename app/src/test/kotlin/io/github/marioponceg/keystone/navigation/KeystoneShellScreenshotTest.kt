@@ -16,6 +16,7 @@ import androidx.window.core.layout.WindowSizeClass
 import androidx.window.core.layout.computeWindowSizeClass
 import com.github.takahirom.roborazzi.captureRoboImage
 import io.github.marioponceg.foundry.tokens.FoundryTheme
+import io.github.marioponceg.keystone.ui.WithFakeImages
 import io.github.marioponceg.keystone.ui.character.CharacterDetailContent
 import io.github.marioponceg.keystone.ui.character.CharacterDetailStateProvider
 import io.github.marioponceg.keystone.ui.home.HomeContent
@@ -82,7 +83,9 @@ class KeystoneShellScreenshotTest {
     private fun capture(name: String, darkTheme: Boolean, withCharacter: Boolean) {
         composeRule.setContent {
             FoundryTheme(darkTheme = darkTheme) {
-                TestShell(withCharacter = withCharacter)
+                WithFakeImages {
+                    TestShell(withCharacter = withCharacter)
+                }
             }
         }
         composeRule.onRoot().captureRoboImage("src/test/screenshots/$name.png")
@@ -157,7 +160,9 @@ class KeystoneShellScreenshotTest {
     private fun captureHinged(name: String, darkTheme: Boolean) {
         composeRule.setContent {
             FoundryTheme(darkTheme = darkTheme) {
-                HingedShell()
+                WithFakeImages {
+                    HingedShell()
+                }
             }
         }
         composeRule.onRoot().captureRoboImage("src/test/screenshots/$name.png")

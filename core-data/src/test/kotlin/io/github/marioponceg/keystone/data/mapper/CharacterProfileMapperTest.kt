@@ -14,6 +14,7 @@ import io.github.marioponceg.keystone.domain.model.Role
 import kotlinx.serialization.encodeToString
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -119,5 +120,24 @@ class CharacterProfileMapperTest {
         assertEquals(0.0, profile.score.overall)
         assertTrue(profile.score.roles.isEmpty())
         assertTrue(profile.bestRuns.isEmpty())
+    }
+
+    @Test
+    fun `carries the avatar url through to the domain`() {
+        assertEquals(
+            "https://render.worldofwarcraft.com/eu/character/tarren-mill/119/181857655-avatar.jpg" +
+                "?alt=/wow/static/images/2d/avatar/10-0.jpg",
+            decode().toDomain(requested).avatarUrl,
+        )
+    }
+
+    @Test
+    fun `a profile without an avatar maps to null rather than failing`() {
+        // The field is absent from this payload entirely, which is the case that would throw if
+        // the DTO property had no default.
+        val dto = KeystoneJson.decodeFromString<CharacterProfileDto>(
+            """{"name":"X","class":"Mage","active_spec_name":"Frost","realm":"Tarren Mill"}""",
+        )
+        assertNull(dto.toDomain(requested).avatarUrl)
     }
 }

@@ -4,6 +4,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
 import com.github.takahirom.roborazzi.captureRoboImage
 import io.github.marioponceg.foundry.tokens.FoundryTheme
+import io.github.marioponceg.keystone.ui.WithFakeImages
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,12 +32,14 @@ class CharacterDetailTabletopScreenshotTest {
     private fun capture(name: String, darkTheme: Boolean) {
         composeRule.setContent {
             FoundryTheme(darkTheme = darkTheme) {
-                CharacterDetailContent(
-                    state = contentState,
-                    onEvent = {},
-                    showBackAction = false,
-                    isTabletop = true,
-                )
+                WithFakeImages {
+                    CharacterDetailContent(
+                        state = contentState,
+                        onEvent = {},
+                        showBackAction = false,
+                        isTabletop = true,
+                    )
+                }
             }
         }
         composeRule.onRoot().captureRoboImage("src/test/screenshots/$name.png")
