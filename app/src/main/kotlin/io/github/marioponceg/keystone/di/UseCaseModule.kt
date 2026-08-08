@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.github.marioponceg.keystone.domain.repository.AffixesRepository
+import io.github.marioponceg.keystone.domain.repository.AppLocaleProvider
 import io.github.marioponceg.keystone.domain.repository.CharacterRepository
 import io.github.marioponceg.keystone.domain.repository.RealmRepository
 import io.github.marioponceg.keystone.domain.repository.RecentSearchesRepository
@@ -27,8 +28,10 @@ object UseCaseModule {
         GetCharacterProfile(repository)
 
     @Provides
-    fun provideGetWeeklyAffixes(repository: AffixesRepository): GetWeeklyAffixes =
-        GetWeeklyAffixes(repository)
+    fun provideGetWeeklyAffixes(
+        repository: AffixesRepository,
+        localeProvider: AppLocaleProvider,
+    ): GetWeeklyAffixes = GetWeeklyAffixes(repository, localeProvider)
 
     @Provides
     fun provideObserveRecentSearches(repository: RecentSearchesRepository): ObserveRecentSearches =

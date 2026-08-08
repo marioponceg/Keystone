@@ -16,6 +16,7 @@ import io.github.marioponceg.keystone.domain.usecase.ObserveSelectedRegion
 import io.github.marioponceg.keystone.domain.usecase.RemoveRecentSearch
 import io.github.marioponceg.keystone.domain.usecase.SaveSelectedRegion
 import io.github.marioponceg.keystone.ui.FakeAffixesRepository
+import io.github.marioponceg.keystone.ui.FakeAppLocaleProvider
 import io.github.marioponceg.keystone.ui.FakeRealmRepository
 import io.github.marioponceg.keystone.ui.FakeRecentSearchesRepository
 import io.github.marioponceg.keystone.ui.FakeRegionPreferenceRepository
@@ -43,8 +44,10 @@ class HomeViewModelTest {
     )
     private val realmRepository = FakeRealmRepository(mapOf(Region.EU to euRealms))
 
+    private val localeProvider = FakeAppLocaleProvider()
+
     private fun viewModel() = HomeViewModel(
-        getWeeklyAffixes = GetWeeklyAffixes(affixesRepository),
+        getWeeklyAffixes = GetWeeklyAffixes(affixesRepository, localeProvider),
         getRealms = GetRealms(realmRepository),
         observeRecentSearches = ObserveRecentSearches(recentsRepository),
         removeRecentSearch = RemoveRecentSearch(recentsRepository),

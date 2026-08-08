@@ -1,6 +1,7 @@
 package io.github.marioponceg.keystone.domain.fake
 
 import io.github.marioponceg.keystone.domain.error.KeystoneResult
+import io.github.marioponceg.keystone.domain.model.ApiLocale
 import io.github.marioponceg.keystone.domain.model.CharacterId
 import io.github.marioponceg.keystone.domain.model.CharacterProfile
 import io.github.marioponceg.keystone.domain.model.RecentSearch
@@ -8,6 +9,7 @@ import io.github.marioponceg.keystone.domain.model.Region
 import io.github.marioponceg.keystone.domain.model.WeeklyAffixes
 import io.github.marioponceg.keystone.domain.model.push
 import io.github.marioponceg.keystone.domain.repository.AffixesRepository
+import io.github.marioponceg.keystone.domain.repository.AppLocaleProvider
 import io.github.marioponceg.keystone.domain.repository.CharacterRepository
 import io.github.marioponceg.keystone.domain.repository.RecentSearchesRepository
 import io.github.marioponceg.keystone.domain.repository.RegionPreferenceRepository
@@ -24,9 +26,19 @@ class FakeCharacterRepository(var result: KeystoneResult<CharacterProfile>) : Ch
 
 class FakeAffixesRepository(var result: KeystoneResult<WeeklyAffixes>) : AffixesRepository {
     var lastRegion: Region? = null
-    override suspend fun getWeeklyAffixes(region: Region): KeystoneResult<WeeklyAffixes> {
+    var lastLocale: ApiLocale? = null
+    override suspend fun getWeeklyAffixes(region: Region, locale: ApiLocale): KeystoneResult<WeeklyAffixes> {
         lastRegion = region
+        lastLocale = locale
         return result
+    }
+}
+
+class FakeAppLocaleProvider(var locale: ApiLocale = ApiLocale.EN) : AppLocaleProvider {
+    var calls: Int = 0
+    override fun current(): ApiLocale {
+        calls++
+        return locale
     }
 }
 

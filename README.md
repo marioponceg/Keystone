@@ -29,7 +29,8 @@ no analytics.
 - **Mythic+ profile** — season score (colored to match the official Raider.IO score bands) with
   a per-role breakdown, and best runs per dungeon with upgrade stars, clear times and
   class-colored character names.
-- **Weekly affixes** — a card on the home screen showing the current M+ affix rotation.
+- **Weekly affixes** — a card on the home screen showing the current M+ affix rotation, in the
+  device's language where Raider.IO translates it (English otherwise).
 - **Recent searches** — the last 10 lookups, deduplicated, saved only after a successful
   profile load (so a typo never pollutes the list), with per-item delete.
 - **Adaptive layout** — a two-pane list-detail layout at expanded width (tablet landscape,
@@ -129,7 +130,6 @@ Future versions, not in scope for v0.2:
 - Battle.net OAuth and the official Blizzard API, replacing the auth-free Raider.IO endpoints
 - Character avatars, loaded via Coil
 - Opening a run's page on Raider.IO in a Custom Tab, instead of only showing its stats in-app
-- Region-aware localization of affix descriptions, using the Raider.IO API's `locale` parameter
 
 ### On iOS
 
