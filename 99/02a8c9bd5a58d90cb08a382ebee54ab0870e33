@@ -1,0 +1,19 @@
+README.md
+  s_2ac91425d1313d::t_5e9f571ed650ac 90-94,100-101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "9902a8c9bd5a58d90cb08a382ebee54ab0870e33",
+  "prompts": {},
+  "sessions": {
+    "s_2ac91425d1313d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8c8d7c32-881c-46a2-a283-c9ace5e16546",
+        "model": "unknown"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    }
+  }
+}
