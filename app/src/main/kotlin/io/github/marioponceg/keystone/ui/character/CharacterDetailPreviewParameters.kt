@@ -10,6 +10,7 @@ import io.github.marioponceg.keystone.domain.model.Realm
 import io.github.marioponceg.keystone.domain.model.Region
 import io.github.marioponceg.keystone.domain.model.Role
 import io.github.marioponceg.keystone.domain.model.RoleScore
+import io.github.marioponceg.keystone.domain.model.RunAffix
 import io.github.marioponceg.keystone.domain.model.SeasonScore
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -38,6 +39,7 @@ class CharacterDetailStateProvider : PreviewParameterProvider<CharacterDetailUiS
         ),
         bestRuns = listOf(
             DungeonRun(
+                id = 14598027,
                 dungeonName = "Ara-Kara, City of Echoes",
                 shortName = "ARAK",
                 keystoneLevel = 12,
@@ -45,12 +47,16 @@ class CharacterDetailStateProvider : PreviewParameterProvider<CharacterDetailUiS
                 clearTime = 24.minutes + 10.seconds,
                 parTime = 30.minutes,
                 score = 320.5,
-                id = 1L,
-                iconUrl = null,
-                completedAtEpochMillis = null,
-                affixes = emptyList(),
+                iconUrl = "https://cdn.raiderio.net/images/wow/icons/large/arakara.jpg",
+                // 2026-04-18T12:00:00Z — midday, so no timezone can move it to another date.
+                completedAtEpochMillis = 1776513600000,
+                affixes = listOf(
+                    RunAffix("Tyrannical", "https://cdn.raiderio.net/images/wow/icons/large/tyr.jpg"),
+                    RunAffix("Fortified", "https://cdn.raiderio.net/images/wow/icons/large/fort.jpg"),
+                ),
             ),
             DungeonRun(
+                id = 14567129,
                 dungeonName = "The Stonevault",
                 shortName = "SV",
                 keystoneLevel = 10,
@@ -58,12 +64,16 @@ class CharacterDetailStateProvider : PreviewParameterProvider<CharacterDetailUiS
                 clearTime = 29.minutes + 45.seconds,
                 parTime = 30.minutes,
                 score = 285.0,
-                id = 2L,
-                iconUrl = null,
-                completedAtEpochMillis = null,
-                affixes = emptyList(),
+                iconUrl = "https://cdn.raiderio.net/images/wow/icons/large/stonevault.jpg",
+                completedAtEpochMillis = 1776513600000,
+                // Deliberately different from the first run's, so a test asserting one is closed
+                // and the other open cannot pass by accident.
+                affixes = listOf(
+                    RunAffix("Storming", "https://cdn.raiderio.net/images/wow/icons/large/storm.jpg"),
+                ),
             ),
             DungeonRun(
+                id = 14512004,
                 dungeonName = "City of Threads",
                 shortName = "COT",
                 keystoneLevel = 9,
@@ -71,7 +81,7 @@ class CharacterDetailStateProvider : PreviewParameterProvider<CharacterDetailUiS
                 clearTime = 33.minutes,
                 parTime = 30.minutes,
                 score = 250.2,
-                id = 3L,
+                // No icon, no date, no affixes: the degraded row every golden should also show.
                 iconUrl = null,
                 completedAtEpochMillis = null,
                 affixes = emptyList(),
