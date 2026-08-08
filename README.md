@@ -128,7 +128,7 @@ time only — the app itself calls only Raider.IO's documented v1 API.
 
 ## Roadmap
 
-Future versions, not in scope for v0.3:
+Future versions, not in scope for v0.4:
 
 - Crashlytics, including a `QuillSink` that forwards Quill events to it
 - Battle.net OAuth and the official Blizzard API, replacing the auth-free Raider.IO endpoints

@@ -2,6 +2,7 @@ package io.github.marioponceg.keystone.ui.common
 
 import android.content.Intent
 import androidx.activity.ComponentActivity
+import androidx.browser.customtabs.CustomTabsIntent
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
@@ -35,6 +36,27 @@ class CustomTabTest {
         assertNotNull(started)
         assertEquals(Intent.ACTION_VIEW, started.action)
         assertEquals("https://raider.io/run", started.data.toString())
+
+        // FLAG_ACTIVITY_NEW_TASK must never come back. Launching from an Activity context with
+        // that flag set makes Android bring the browser's existing task to the foreground and
+        // stack the Custom Tab on top of it, so Back walks the browser's history instead of
+        // returning to Keystone. If a future change moves this test back to an Application
+        // context, Robolectric will throw `AndroidRuntimeException: Calling startActivity() from
+        // outside of an Activity context requires FLAG_ACTIVITY_NEW_TASK` here - do not silence
+        // that by re-adding the flag to production; fix the test context instead.
+        assertEquals(0, started.flags and Intent.FLAG_ACTIVITY_NEW_TASK)
+
+        // setDefaultColorSchemeParams(...) packs the toolbar color into the intent extras under
+        // this same key (verified against the androidx.browser 1.10.0 sources: `toBundle()` in
+        // `CustomTabColorSchemeParams` calls `bundle.putInt(EXTRA_TOOLBAR_COLOR, toolbarColor)`,
+        // and `CustomTabsIntent.Builder.build()` merges that bundle straight into the intent's
+        // extras). Deleting the `setDefaultColorSchemeParams` call would leave the Custom Tab
+        // themed with the browser's default colors instead of Keystone's, with no golden able to
+        // catch it.
+        assertEquals(
+            0xFF101010.toInt(),
+            started.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, 0),
+        )
     }
 
     @Test
