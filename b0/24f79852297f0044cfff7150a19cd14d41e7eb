@@ -1,0 +1,27 @@
+app/build.gradle.kts
+  s_20ca37a3cce55d::t_6f0662c6c5533a 65-66,81
+app/src/main/kotlin/io/github/marioponceg/keystone/ui/common/CharacterAvatar.kt
+  s_20ca37a3cce55d::t_d2c68d2f2eb404 1-72
+app/src/test/kotlin/io/github/marioponceg/keystone/ui/FakeImages.kt
+  s_20ca37a3cce55d::t_b21f6e786f096e 1-47
+app/src/test/kotlin/io/github/marioponceg/keystone/ui/character/CharacterAvatarScreenshotTest.kt
+  s_20ca37a3cce55d::t_55ef96e70f62bd 1-62
+gradle/libs.versions.toml
+  s_20ca37a3cce55d::t_c16e1852771aeb 25-28,63-65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "b024f79852297f0044cfff7150a19cd14d41e7eb",
+  "prompts": {},
+  "sessions": {
+    "s_20ca37a3cce55d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "174bf8a6-c053-48c3-8854-352b5f3d6c5a",
+        "model": "unknown"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    }
+  }
+}
