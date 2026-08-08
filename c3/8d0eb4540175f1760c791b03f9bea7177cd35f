@@ -1,0 +1,31 @@
+AGENTS.md
+  s_30584296e9f4ac::t_752a17450cc42d 129-136
+README.md
+  s_30584296e9f4ac::t_0e43dc8a9d40af 43-44
+app/build.gradle.kts
+  s_30584296e9f4ac::t_7e12d3084cccae 23,63
+app/src/main/kotlin/io/github/marioponceg/keystone/navigation/KeystoneNavDisplay.kt
+  s_30584296e9f4ac::t_e84da0bfcdee10 11-12,21,27,48-49,59-62
+app/src/main/kotlin/io/github/marioponceg/keystone/ui/common/CustomTab.kt
+  s_30584296e9f4ac::t_f1efcf918596db 1-41
+app/src/test/kotlin/io/github/marioponceg/keystone/ui/common/CustomTabTest.kt
+  s_30584296e9f4ac::t_e825062a98d816 1-50
+gradle/libs.versions.toml
+  s_30584296e9f4ac::t_900fc9bb9a81e8 14,52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "c38d0eb4540175f1760c791b03f9bea7177cd35f",
+  "prompts": {},
+  "sessions": {
+    "s_30584296e9f4ac": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a951c7facadf1f63c",
+        "model": "unknown"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    }
+  }
+}
