@@ -1,14 +1,24 @@
 package io.github.marioponceg.keystone.ui.common
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
+import io.github.marioponceg.foundry.tokens.FoundryTheme
 
 /**
  * The safe area as `contentPadding` for a scrolling container, widened by [horizontal] of design
@@ -32,5 +42,39 @@ fun safeDrawingContentPadding(horizontal: Dp): PaddingValues {
         top = safeArea.calculateTopPadding(),
         end = safeArea.calculateEndPadding(layoutDirection) + horizontal,
         bottom = safeArea.calculateBottomPadding(),
+    )
+}
+
+// The scrim runs slightly past the status bar so the gradient finishes fading below it rather than
+// stopping at a visible hard line exactly on the boundary.
+private const val SCRIM_OVERSHOOT = 1.2f
+
+/**
+ * A fade over the status bar, drawn on top of everything else.
+ *
+ * The counterpart to [safeDrawingContentPadding]: that keeps content *out* of the status bar when
+ * the list is at rest, but a scrolling list is supposed to travel *behind* it, and there the clock
+ * and the app's own text land on top of each other and neither can be read. This puts the app's
+ * background back underneath the system icons, fading out so it never reads as an opaque bar.
+ *
+ * Draw it as the last child of a full-screen container so it sits above the content it protects.
+ */
+@Composable
+fun StatusBarProtection(
+    modifier: Modifier = Modifier,
+    color: Color = FoundryTheme.colors.background,
+) {
+    val height = with(LocalDensity.current) {
+        (WindowInsets.statusBars.getTop(this) * SCRIM_OVERSHOOT).toDp()
+    }
+    Spacer(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(height)
+            .background(
+                Brush.verticalGradient(
+                    listOf(color, color.copy(alpha = 0.8f), Color.Transparent),
+                ),
+            ),
     )
 }
