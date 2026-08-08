@@ -1,0 +1,23 @@
+AGENTS.md
+  s_2ac91425d1313d::t_c4887920ef0e63 98-102
+README.md
+  s_2ac91425d1313d::t_2b646b4d25087b 41-42
+app/src/main/kotlin/io/github/marioponceg/keystone/ui/character/DungeonRunCard.kt
+  s_2ac91425d1313d::t_16d324aa5145d3 53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "4a661c399b01a71abfc4405735adc13436e2bd9d",
+  "prompts": {},
+  "sessions": {
+    "s_2ac91425d1313d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8c8d7c32-881c-46a2-a283-c9ace5e16546",
+        "model": "unknown"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    }
+  }
+}
