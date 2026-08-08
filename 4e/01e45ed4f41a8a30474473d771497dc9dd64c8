@@ -1,0 +1,29 @@
+app/src/main/kotlin/io/github/marioponceg/keystone/ui/character/CharacterDetailComponents.kt
+  s_20ca37a3cce55d::t_c6d4d98f9bad92 22,30-39,41-52
+app/src/main/kotlin/io/github/marioponceg/keystone/ui/character/CharacterDetailPreviewParameters.kt
+  s_20ca37a3cce55d::t_2e88b460142e9b 28-30
+app/src/test/kotlin/io/github/marioponceg/keystone/navigation/KeystoneShellScreenshotTest.kt
+  s_20ca37a3cce55d::t_68b4e052e7c217 19,86-88,163-165
+app/src/test/kotlin/io/github/marioponceg/keystone/ui/FakeImages.kt
+  s_20ca37a3cce55d::t_8458cec0d5f6d9 9-10,24-42,46,53-54,59
+app/src/test/kotlin/io/github/marioponceg/keystone/ui/character/CharacterDetailScreenshotTest.kt
+  s_20ca37a3cce55d::t_149ab47ae85bb5 7,31-33
+app/src/test/kotlin/io/github/marioponceg/keystone/ui/character/CharacterDetailTabletopScreenshotTest.kt
+  s_20ca37a3cce55d::t_5a71f09c771db8 7,35-42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "4e01e45ed4f41a8a30474473d771497dc9dd64c8",
+  "prompts": {},
+  "sessions": {
+    "s_20ca37a3cce55d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "174bf8a6-c053-48c3-8854-352b5f3d6c5a",
+        "model": "unknown"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    }
+  }
+}
