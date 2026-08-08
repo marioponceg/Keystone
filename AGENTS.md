@@ -61,6 +61,35 @@ commit history, PRs, and code.
 - **Experimental Compose APIs (`Grid`, `FlexBox`, `MediaQuery`) are not used**, though available in
   Compose 1.11.4 — the layouts here need only `BoxWithConstraints`, `Row`/`Column` and
   `hoverable`.
+- **v0.3 scope**: product polish on the existing Raider.IO data source only — weekly affixes in the
+  device's language, and the character avatar in the detail header. No new data source, no backend.
+  Two standalone PRs off `main`, no stack.
+- **The official Blizzard API is out, with reasons** (investigated 2026-08-08, do not re-propose
+  without new evidence). Battle.net's OAuth discovery document does not advertise
+  `code_challenge_methods_supported`, so there is no PKCE; the token exchange authenticates with the
+  client secret over HTTP Basic, and the redirect URI must be HTTPS. An Android app is a public
+  client and cannot hold that secret, so **any** Blizzard access — including `client_credentials`
+  for public game data — needs a token broker, which contradicts **no backend**. It would also buy
+  almost nothing: Raider.IO already returns `thumbnail_url` (the avatar, on Blizzard's public CDN)
+  and accepts a `locale` parameter, and Blizzard has **no endpoint for the current week's affix
+  rotation** — `mythic-keystone/period/{id}` returns timestamps only — so even a full migration
+  would keep Raider.IO for the affix card. Blizzard uniquely offers account-level "my characters"
+  data; revisit together with the broker if that ever becomes a feature.
+- **Affix locale comes from the device, not the region**: `Region` identifies where a character's
+  realm lives and says nothing about the reader's language — EU alone spans seven languages
+  Raider.IO translates. The v0.1 README's "region-aware localization" framing was wrong and has
+  been corrected. Supported locales, probed live: `en es de fr it pt ru ko cn tw`; anything else is
+  answered in English **silently, without an error**, so there is no failure path to model.
+- **Coil is capped by the Kotlin version**: 3.4.0 depends on `kotlin-stdlib` 2.3.10 and 3.5.0 on
+  2.4.0, whose metadata the project's Kotlin 2.2.10 compiler cannot read — `build` fails outright.
+  3.3.0 is the newest release built against 2.2.x. Bump it together with Kotlin, which tracks AGP.
+- **Remote images never reach the network in tests or previews**: `WithFakeImages` (app test source
+  set) installs a Coil `FakeImageLoaderEngine` **once per process** via `setUnsafe` — not
+  `setSingletonImageLoaderFactory`, which delegates to `setSafe` and throws once the singleton
+  exists, and Robolectric runs every test class in one JVM. It also provides
+  `LocalAsyncImagePreviewHandler`, because `AsyncImage` short-circuits on `LocalInspectionMode` and
+  would otherwise draw nothing in a `@Preview`. Any screenshot test whose composable can reach an
+  `AsyncImage` must be wrapped in it.
 
 Any design decision **not** listed above must be raised with the maintainer before implementing.
 
