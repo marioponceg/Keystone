@@ -26,9 +26,9 @@ no analytics.
 - **Character search** — character name plus a searchable realm picker backed by a bundled
   per-region realm list (no network round-trip to resolve a realm), with region chips and the
   last-used region persisted across launches.
-- **Mythic+ profile** — season score (colored to match the official Raider.IO score bands) with
-  a per-role breakdown, and best runs per dungeon with upgrade stars, clear times and
-  class-colored character names.
+- **Mythic+ profile** — the character's avatar, season score (colored to match the official
+  Raider.IO score bands) with a per-role breakdown, and best runs per dungeon with upgrade stars,
+  clear times and class-colored character names.
 - **Weekly affixes** — a card on the home screen showing the current M+ affix rotation, in the
   device's language where Raider.IO translates it (English otherwise).
 - **Recent searches** — the last 10 lookups, deduplicated, saved only after a successful
@@ -128,7 +128,6 @@ Future versions, not in scope for v0.2:
 
 - Crashlytics, including a `QuillSink` that forwards Quill events to it
 - Battle.net OAuth and the official Blizzard API, replacing the auth-free Raider.IO endpoints
-- Character avatars, loaded via Coil
 - Opening a run's page on Raider.IO in a Custom Tab, instead of only showing its stats in-app
 
 ### On iOS
