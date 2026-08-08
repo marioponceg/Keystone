@@ -1,0 +1,27 @@
+AGENTS.md
+  s_20ca37a3cce55d::t_1b21410b2e8841 94-109
+app/src/main/AndroidManifest.xml
+  s_20ca37a3cce55d::t_2f1565e24311d8 21-22
+app/src/main/kotlin/io/github/marioponceg/keystone/ui/character/CharacterDetailScreen.kt
+  s_20ca37a3cce55d::t_683876f0f5cc1c 12,28,98-99,127,145-146,176
+app/src/main/kotlin/io/github/marioponceg/keystone/ui/common/Insets.kt
+  s_20ca37a3cce55d::t_765a0341425e13 1-36
+app/src/main/kotlin/io/github/marioponceg/keystone/ui/home/HomeScreen.kt
+  s_20ca37a3cce55d::t_e95c548b88d4b4 19,54,125-126,174-176
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "f3659df4c14eb799473fac6ebe20dddf1785e3ac",
+  "prompts": {},
+  "sessions": {
+    "s_20ca37a3cce55d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "174bf8a6-c053-48c3-8854-352b5f3d6c5a",
+        "model": "unknown"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    }
+  }
+}
