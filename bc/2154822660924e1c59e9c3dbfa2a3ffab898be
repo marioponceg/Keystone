@@ -1,0 +1,21 @@
+README.md
+  s_20ca37a3cce55d::t_cc87ec32c937c4 127
+app/build.gradle.kts
+  s_20ca37a3cce55d::t_fc6929a5753bb6 23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "bc2154822660924e1c59e9c3dbfa2a3ffab898be",
+  "prompts": {},
+  "sessions": {
+    "s_20ca37a3cce55d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "174bf8a6-c053-48c3-8854-352b5f3d6c5a",
+        "model": "unknown"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    }
+  }
+}
