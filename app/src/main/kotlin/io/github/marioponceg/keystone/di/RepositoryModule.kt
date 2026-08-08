@@ -8,7 +8,9 @@ import io.github.marioponceg.keystone.data.remote.RaiderIoApi
 import io.github.marioponceg.keystone.data.repository.AffixesRepositoryImpl
 import io.github.marioponceg.keystone.data.repository.CharacterRepositoryImpl
 import io.github.marioponceg.keystone.domain.repository.AffixesRepository
+import io.github.marioponceg.keystone.domain.repository.AppLocaleProvider
 import io.github.marioponceg.keystone.domain.repository.CharacterRepository
+import io.github.marioponceg.keystone.locale.DeviceLocaleProvider
 import javax.inject.Singleton
 
 @Module
@@ -22,4 +24,8 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideAffixesRepository(api: RaiderIoApi): AffixesRepository = AffixesRepositoryImpl(api)
+
+    @Provides
+    @Singleton
+    fun provideAppLocaleProvider(): AppLocaleProvider = DeviceLocaleProvider()
 }
