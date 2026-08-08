@@ -20,6 +20,7 @@ class DungeonRunTest {
             iconUrl = null,
             completedAtEpochMillis = null,
             affixes = emptyList(),
+            url = null,
         )
         assertTrue(run.isTimed)
     }
@@ -38,6 +39,7 @@ class DungeonRunTest {
             iconUrl = null,
             completedAtEpochMillis = null,
             affixes = emptyList(),
+            url = null,
         )
         assertFalse(run.isTimed)
     }
@@ -56,6 +58,7 @@ class DungeonRunTest {
             iconUrl = null,
             completedAtEpochMillis = null,
             affixes = emptyList(),
+            url = null,
         )
         assertTrue(run.isTimed)
     }

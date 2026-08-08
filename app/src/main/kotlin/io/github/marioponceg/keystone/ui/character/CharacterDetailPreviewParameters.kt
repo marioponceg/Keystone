@@ -54,6 +54,7 @@ class CharacterDetailStateProvider : PreviewParameterProvider<CharacterDetailUiS
                     RunAffix("Tyrannical", "https://cdn.raiderio.net/images/wow/icons/large/tyr.jpg"),
                     RunAffix("Fortified", "https://cdn.raiderio.net/images/wow/icons/large/fort.jpg"),
                 ),
+                url = "https://raider.io/mythic-plus-runs/season-mn-1/14598027-12-ara-kara",
             ),
             DungeonRun(
                 id = 14567129,
@@ -71,6 +72,7 @@ class CharacterDetailStateProvider : PreviewParameterProvider<CharacterDetailUiS
                 affixes = listOf(
                     RunAffix("Storming", "https://cdn.raiderio.net/images/wow/icons/large/storm.jpg"),
                 ),
+                url = "https://raider.io/mythic-plus-runs/season-mn-1/14567129-10-the-stonevault",
             ),
             DungeonRun(
                 id = 14512004,
@@ -81,10 +83,12 @@ class CharacterDetailStateProvider : PreviewParameterProvider<CharacterDetailUiS
                 clearTime = 33.minutes,
                 parTime = 30.minutes,
                 score = 250.2,
-                // No icon, no date, no affixes: the degraded row every golden should also show.
+                // No icon, no date, no affixes, no url: the degraded row every golden should also
+                // show.
                 iconUrl = null,
                 completedAtEpochMillis = null,
                 affixes = emptyList(),
+                url = null, // the degraded run: no url, so no button
             ),
         ),
     )

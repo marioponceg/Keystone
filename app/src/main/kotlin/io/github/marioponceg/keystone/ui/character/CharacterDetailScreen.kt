@@ -34,12 +34,14 @@ import io.github.marioponceg.keystone.ui.common.safeDrawingContentPadding
 fun CharacterDetailScreen(
     onBack: () -> Unit,
     viewModel: CharacterDetailViewModel,
+    onOpenRun: (String) -> Unit,
     showBackAction: Boolean = true,
     isTabletop: Boolean = false,
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     CharacterDetailContent(
         state = state,
+        onOpenRun = onOpenRun,
         showBackAction = showBackAction,
         isTabletop = isTabletop,
         onEvent = { event ->
@@ -55,6 +57,7 @@ fun CharacterDetailScreen(
 fun CharacterDetailContent(
     state: CharacterDetailUiState,
     onEvent: (CharacterDetailEvent) -> Unit,
+    onOpenRun: (String) -> Unit,
     showBackAction: Boolean = true,
     isTabletop: Boolean = false,
 ) {
@@ -73,9 +76,9 @@ fun CharacterDetailContent(
             is CharacterDetailUiState.Error -> ErrorState(onEvent = onEvent)
             is CharacterDetailUiState.Content ->
                 if (isTabletop) {
-                    TabletopContentState(profile = state.profile)
+                    TabletopContentState(profile = state.profile, onOpenRun = onOpenRun)
                 } else {
-                    ContentState(profile = state.profile)
+                    ContentState(profile = state.profile, onOpenRun = onOpenRun)
                 }
         }
     }
@@ -142,7 +145,7 @@ private fun ErrorState(onEvent: (CharacterDetailEvent) -> Unit) {
 }
 
 @Composable
-private fun ContentState(profile: CharacterProfile) {
+private fun ContentState(profile: CharacterProfile, onOpenRun: (String) -> Unit) {
     val spacing = FoundryTheme.spacing
     var expandedRunId by rememberSaveable { mutableStateOf<Long?>(null) }
     LazyColumn(
@@ -164,6 +167,7 @@ private fun ContentState(profile: CharacterProfile) {
                 run = run,
                 expanded = run.id == expandedRunId,
                 onToggle = { expandedRunId = if (expandedRunId == run.id) null else run.id },
+                onOpenRun = onOpenRun,
             )
         }
         item {
@@ -179,7 +183,7 @@ private fun ContentState(profile: CharacterProfile) {
  * free of window-metrics plumbing that would not be testable in Robolectric anyway.
  */
 @Composable
-private fun TabletopContentState(profile: CharacterProfile) {
+private fun TabletopContentState(profile: CharacterProfile, onOpenRun: (String) -> Unit) {
     val spacing = FoundryTheme.spacing
     var expandedRunId by rememberSaveable { mutableStateOf<Long?>(null) }
     Column(modifier = Modifier.fillMaxSize().safeDrawingPadding()) {
@@ -207,6 +211,7 @@ private fun TabletopContentState(profile: CharacterProfile) {
                         run = run,
                         expanded = run.id == expandedRunId,
                         onToggle = { expandedRunId = if (expandedRunId == run.id) null else run.id },
+                        onOpenRun = onOpenRun,
                     )
                 }
                 item {
@@ -223,6 +228,6 @@ private fun CharacterDetailContentPreview(
     @PreviewParameter(CharacterDetailStateProvider::class) state: CharacterDetailUiState,
 ) {
     FoundryTheme {
-        CharacterDetailContent(state = state, onEvent = {})
+        CharacterDetailContent(state = state, onEvent = {}, onOpenRun = {})
     }
 }

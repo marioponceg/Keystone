@@ -22,6 +22,7 @@ data class DungeonRun(
     val iconUrl: String?,
     val completedAtEpochMillis: Long?,
     val affixes: List<RunAffix>,
+    val url: String?,
 ) {
     val isTimed: Boolean get() = upgrades > 0
 }

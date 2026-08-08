@@ -74,6 +74,7 @@ class KeystoneShellScreenshotTest {
                 CharacterDetailContent(
                     state = detailContentState,
                     onEvent = {},
+                    onOpenRun = {},
                     showBackAction = false,
                 )
             },
@@ -151,6 +152,7 @@ class KeystoneShellScreenshotTest {
                 CharacterDetailContent(
                     state = detailContentState,
                     onEvent = {},
+                    onOpenRun = {},
                     showBackAction = false,
                 )
             },

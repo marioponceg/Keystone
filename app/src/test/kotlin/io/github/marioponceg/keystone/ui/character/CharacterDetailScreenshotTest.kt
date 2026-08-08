@@ -29,7 +29,7 @@ class CharacterDetailScreenshotTest {
         composeRule.setContent {
             FoundryTheme(darkTheme = darkTheme) {
                 WithFakeImages {
-                    CharacterDetailContent(state = state, onEvent = {})
+                    CharacterDetailContent(state = state, onEvent = {}, onOpenRun = {})
                 }
             }
         }

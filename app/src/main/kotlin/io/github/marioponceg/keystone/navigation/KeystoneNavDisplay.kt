@@ -50,6 +50,9 @@ fun KeystoneNavDisplay(backStack: NavBackStack<NavKey>) {
         detailPane = { key, onBack ->
             CharacterDetailScreen(
                 onBack = onBack,
+                // No-op for now: opening the run's page is Task 5's job (a Custom Tab launched
+                // from here, the only place in this composable tree allowed to touch Context).
+                onOpenRun = {},
                 // Read off the same directive that decides the pane count, not off a second,
                 // independently derived view of the window. "Detail is the only pane" and "the
                 // user needs a way back to the list" are the same fact; deriving them separately

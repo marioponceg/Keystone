@@ -51,6 +51,7 @@ data class BestRunDto(
     @SerialName("icon_url") val iconUrl: String? = null,
     @SerialName("completed_at") val completedAt: String? = null,
     val affixes: List<RunAffixDto> = emptyList(),
+    val url: String? = null,
 )
 
 @Serializable

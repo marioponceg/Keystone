@@ -36,6 +36,7 @@ class CharacterDetailTabletopScreenshotTest {
                     CharacterDetailContent(
                         state = contentState,
                         onEvent = {},
+                        onOpenRun = {},
                         showBackAction = false,
                         isTabletop = true,
                     )
