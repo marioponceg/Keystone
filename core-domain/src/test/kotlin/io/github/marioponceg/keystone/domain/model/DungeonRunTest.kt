@@ -16,6 +16,10 @@ class DungeonRunTest {
             clearTime = 25.minutes,
             parTime = 36.minutes,
             score = 325.0,
+            id = 1L,
+            iconUrl = null,
+            completedAtEpochMillis = null,
+            affixes = emptyList(),
         )
         assertTrue(run.isTimed)
     }
@@ -30,6 +34,10 @@ class DungeonRunTest {
             clearTime = 40.minutes,
             parTime = 36.minutes,
             score = 200.0,
+            id = 1L,
+            iconUrl = null,
+            completedAtEpochMillis = null,
+            affixes = emptyList(),
         )
         assertFalse(run.isTimed)
     }
@@ -44,6 +52,10 @@ class DungeonRunTest {
             clearTime = 20.minutes,
             parTime = 36.minutes,
             score = 375.0,
+            id = 1L,
+            iconUrl = null,
+            completedAtEpochMillis = null,
+            affixes = emptyList(),
         )
         assertTrue(run.isTimed)
     }

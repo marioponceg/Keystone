@@ -80,6 +80,26 @@ commit history, PRs, and code.
   Raider.IO translates. The v0.1 README's "region-aware localization" framing was wrong and has
   been corrected. Supported locales, probed live: `en es de fr it pt ru ko cn tw`; anything else is
   answered in English **silently, without an error**, so there is no failure path to model.
+- **`characters/profile` rejects `locale`** (probed 2026-08-08: `400 Invalid request query input`;
+  `mythic-plus/static-data` too). Only `mythic-plus/affixes` accepts it. So the affixes embedded in
+  a run, and dungeon names, are **English by design, not by oversight**, and cannot be localized
+  without a translation table the API does not offer. Translating by id from the weekly endpoint is
+  rejected: it would localize some affixes in a list and not others depending on the current week.
+- **`DungeonRun.completedAtEpochMillis` is a `Long`, not an `Instant`.** `java.time` would break
+  `core-domain`'s KMP-ready promise, `kotlinx-datetime` would be that module's first third-party
+  runtime dependency, and `kotlin.time.Instant` is still `@ExperimentalTime` in Kotlin 2.2.10
+  (verified in `kotlin-stdlib-2.2.10.jar`), which would push `@OptIn` onto every consumer across
+  all three modules. The ISO-8601 parse lives in the `core-data` mapper.
+- **`RunAffix` is not `Affix`.** `Affix` comes from the weekly endpoint — localized, with a
+  description, no icon. `RunAffix` is embedded in the profile — English, with an icon, and a
+  description the app has no localized use for. One type would make half the fields nullable on
+  both sides.
+- **Expansion state is not in `UiState`.** Which run is open is pure UI state, like the realm
+  picker's highlighted index: it lives in a `rememberSaveable` inside each layout body
+  (`ContentState` and `TabletopContentState`), and `DungeonRunCard` is stateless so a golden can
+  capture the expanded card without a click. The two layouts therefore hold the choice
+  independently — folding a device into tabletop with a run open collapses it, which is accepted:
+  the alternative is hoisting state across a layout switch that recomposes from scratch anyway.
 - **Coil is capped by the Kotlin version**: 3.4.0 depends on `kotlin-stdlib` 2.3.10 and 3.5.0 on
   2.4.0, whose metadata the project's Kotlin 2.2.10 compiler cannot read — `build` fails outright.
   3.3.0 is the newest release built against 2.2.x. Bump it together with Kotlin, which tracks AGP.

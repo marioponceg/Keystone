@@ -14,6 +14,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -141,6 +144,7 @@ private fun ErrorState(onEvent: (CharacterDetailEvent) -> Unit) {
 @Composable
 private fun ContentState(profile: CharacterProfile) {
     val spacing = FoundryTheme.spacing
+    var expandedRunId by rememberSaveable { mutableStateOf<Long?>(null) }
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = safeDrawingContentPadding(horizontal = spacing.md),
@@ -155,8 +159,12 @@ private fun ContentState(profile: CharacterProfile) {
         item {
             FoundryText(text = "Best runs", style = FoundryTextStyle.Heading)
         }
-        items(profile.bestRuns, key = { it.dungeonName }) { run ->
-            DungeonRunCard(run = run)
+        items(profile.bestRuns, key = { it.id }) { run ->
+            DungeonRunCard(
+                run = run,
+                expanded = run.id == expandedRunId,
+                onToggle = { expandedRunId = if (expandedRunId == run.id) null else run.id },
+            )
         }
         item {
             Spacer(modifier = Modifier.height(spacing.lg))
@@ -173,6 +181,7 @@ private fun ContentState(profile: CharacterProfile) {
 @Composable
 private fun TabletopContentState(profile: CharacterProfile) {
     val spacing = FoundryTheme.spacing
+    var expandedRunId by rememberSaveable { mutableStateOf<Long?>(null) }
     Column(modifier = Modifier.fillMaxSize().safeDrawingPadding()) {
         Column(
             modifier = Modifier
@@ -193,8 +202,12 @@ private fun TabletopContentState(profile: CharacterProfile) {
         ) {
             FoundryText(text = "Best runs", style = FoundryTextStyle.Heading)
             LazyColumn(verticalArrangement = Arrangement.spacedBy(spacing.md)) {
-                items(profile.bestRuns, key = { it.dungeonName }) { run ->
-                    DungeonRunCard(run = run)
+                items(profile.bestRuns, key = { it.id }) { run ->
+                    DungeonRunCard(
+                        run = run,
+                        expanded = run.id == expandedRunId,
+                        onToggle = { expandedRunId = if (expandedRunId == run.id) null else run.id },
+                    )
                 }
                 item {
                     Spacer(modifier = Modifier.height(spacing.lg))
