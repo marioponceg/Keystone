@@ -1,0 +1,25 @@
+core-data/src/main/kotlin/io/github/marioponceg/keystone/data/mapper/CharacterProfileMapper.kt
+  s_20ca37a3cce55d::t_f68a5e40509e9c 44
+core-data/src/main/kotlin/io/github/marioponceg/keystone/data/remote/dto/CharacterProfileDto.kt
+  s_20ca37a3cce55d::t_e414e395cceaf3 12
+core-data/src/test/kotlin/io/github/marioponceg/keystone/data/mapper/CharacterProfileMapperTest.kt
+  s_20ca37a3cce55d::t_a6bc5687eeb94b 17,124-142
+core-domain/src/main/kotlin/io/github/marioponceg/keystone/domain/model/CharacterProfile.kt
+  s_20ca37a3cce55d::t_5bb36e9a981b33 12-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "16c6d3e5bcc37ff5d2fe48473ad347edd746f0ee",
+  "prompts": {},
+  "sessions": {
+    "s_20ca37a3cce55d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "174bf8a6-c053-48c3-8854-352b5f3d6c5a",
+        "model": "unknown"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    }
+  }
+}
