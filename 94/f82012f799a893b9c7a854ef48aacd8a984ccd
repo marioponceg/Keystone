@@ -1,0 +1,53 @@
+app/src/main/kotlin/io/github/marioponceg/keystone/ui/character/DungeonRunCard.kt
+  s_2ac91425d1313d::t_157d906c021b8a 29-30,61-66,107,150-153,172-178
+core-domain/src/test/kotlin/io/github/marioponceg/keystone/domain/model/DungeonRunTest.kt
+  s_2ac91425d1313d::t_4f7e818146e26b 23,42,61
+app/src/main/kotlin/io/github/marioponceg/keystone/navigation/KeystoneNavDisplay.kt
+  s_5571b5e84a782a::t_f37e7269c40b5d 53-55
+app/src/main/kotlin/io/github/marioponceg/keystone/ui/character/CharacterDetailPreviewParameters.kt
+  s_5571b5e84a782a::t_592a4affd048df 57,75,86-87,91
+app/src/main/kotlin/io/github/marioponceg/keystone/ui/character/CharacterDetailScreen.kt
+  s_5571b5e84a782a::t_dd0d851a30201a 37,44,60,79,81,148,170,186,214,231
+app/src/test/kotlin/io/github/marioponceg/keystone/navigation/KeystoneShellScreenshotTest.kt
+  s_5571b5e84a782a::t_7eaab217c198d6 77,155
+app/src/test/kotlin/io/github/marioponceg/keystone/ui/character/CharacterDetailExpansionTest.kt
+  s_5571b5e84a782a::t_9372e747151173 4,8,21,50,54-58,103-143
+app/src/test/kotlin/io/github/marioponceg/keystone/ui/character/CharacterDetailScreenshotTest.kt
+  s_5571b5e84a782a::t_9f1e197c26254d 32
+app/src/test/kotlin/io/github/marioponceg/keystone/ui/character/CharacterDetailTabletopScreenshotTest.kt
+  s_5571b5e84a782a::t_34eae496058c08 39
+app/src/test/kotlin/io/github/marioponceg/keystone/ui/character/DungeonRunCardScreenshotTest.kt
+  s_5571b5e84a782a::t_02e99d25e1b4eb 62
+core-data/src/main/kotlin/io/github/marioponceg/keystone/data/mapper/CharacterProfileMapper.kt
+  s_5571b5e84a782a::t_701f43060757ed 51
+core-data/src/main/kotlin/io/github/marioponceg/keystone/data/remote/dto/CharacterProfileDto.kt
+  s_5571b5e84a782a::t_5017cc60d1df2b 54
+core-data/src/test/kotlin/io/github/marioponceg/keystone/data/mapper/CharacterProfileMapperTest.kt
+  s_5571b5e84a782a::t_77caf7f473fc8b 174,222-242
+core-domain/src/main/kotlin/io/github/marioponceg/keystone/domain/model/DungeonRun.kt
+  s_5571b5e84a782a::t_4bcdc2538a42c6 25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "94f82012f799a893b9c7a854ef48aacd8a984ccd",
+  "prompts": {},
+  "sessions": {
+    "s_2ac91425d1313d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8c8d7c32-881c-46a2-a283-c9ace5e16546",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    },
+    "s_5571b5e84a782a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a5b1dfcb3d63f0880",
+        "model": "unknown"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    }
+  }
+}
