@@ -1,0 +1,25 @@
+app/src/main/kotlin/io/github/marioponceg/keystone/navigation/KeystoneShellState.kt
+  s_50282f495c15c2::t_10307a0831c3dc 1-95
+app/src/main/kotlin/io/github/marioponceg/keystone/navigation/NavKeys.kt
+  s_50282f495c15c2::t_96ace33f9432f5 12-17
+app/src/main/kotlin/io/github/marioponceg/keystone/navigation/TopLevelDestination.kt
+  s_50282f495c15c2::t_f1b745bcdb74c3 1-15
+app/src/test/kotlin/io/github/marioponceg/keystone/navigation/KeystoneShellStateTest.kt
+  s_50282f495c15c2::t_6070370f0e488d 1-109
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "47fec2618beb42f0a0a496a3fa078ce3b883115f",
+  "prompts": {},
+  "sessions": {
+    "s_50282f495c15c2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a2b46b854d8fc337e",
+        "model": "unknown"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    }
+  }
+}
