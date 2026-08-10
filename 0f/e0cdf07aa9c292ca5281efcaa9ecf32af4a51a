@@ -1,0 +1,19 @@
+app/src/main/kotlin/io/github/marioponceg/keystone/ui/week/WeekScreen.kt
+  s_c2450d302f58a7::t_9eccf35a326476 12,107
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "0fe0cdf07aa9c292ca5281efcaa9ecf32af4a51a",
+  "prompts": {},
+  "sessions": {
+    "s_c2450d302f58a7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-afd53cf5bee3c4700",
+        "model": "unknown"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    }
+  }
+}
