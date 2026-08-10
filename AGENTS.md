@@ -134,6 +134,14 @@ commit history, PRs, and code.
 - **v0.4 scope**: run depth on the existing Raider.IO response — an expandable best-run card
   (affixes, dungeon icon, completion date) and a Custom Tab to the run's page. No new request, no
   new data source, no backend. Two sequential PRs off `main`, no stack.
+- **The navigation container choice is a window-level fact.** `NavigationBar` below medium width,
+  `NavigationRail` at medium and above, chosen from `KeystoneWindowInfo` and never from a `UiState`
+  — the same rule that already governs the realm picker's dialog-versus-sheet decision.
+- **The bar's inset must be consumed, not applied twice.** `NavigationBar`/`NavigationRail` apply
+  the system inset on their own edge, and the pane beside them calls `consumeWindowInsets` for that
+  edge so `safeDrawingContentPadding` inside a list reads only the remainder. Content is bounded
+  above the app bar rather than scrolling behind it: the edge-to-edge rule is about the translucent
+  *system* bars, and an opaque app-drawn bar hides whatever passes under it.
 
 Any design decision **not** listed above must be raised with the maintainer before implementing.
 
