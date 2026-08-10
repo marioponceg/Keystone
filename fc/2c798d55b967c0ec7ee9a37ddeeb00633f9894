@@ -1,0 +1,27 @@
+AGENTS.md
+  s_3dbbb0e6e3fbb4::t_e255fa0a222e80 137-144
+app/build.gradle.kts
+  s_3dbbb0e6e3fbb4::t_2b459fff36fab9 55
+app/src/main/kotlin/io/github/marioponceg/keystone/ui/adaptive/KeystoneNavigationScaffold.kt
+  s_3dbbb0e6e3fbb4::t_b6b8afd4f15216 1-105
+app/src/test/kotlin/io/github/marioponceg/keystone/ui/adaptive/KeystoneNavigationScaffoldTest.kt
+  s_3dbbb0e6e3fbb4::t_cbced91f7fc2fb 1-60
+gradle/libs.versions.toml
+  s_3dbbb0e6e3fbb4::t_96c63ad8f9a7ac 44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "fc2c798d55b967c0ec7ee9a37ddeeb00633f9894",
+  "prompts": {},
+  "sessions": {
+    "s_3dbbb0e6e3fbb4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a5452bc0ad2ac91b1",
+        "model": "unknown"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    }
+  }
+}
