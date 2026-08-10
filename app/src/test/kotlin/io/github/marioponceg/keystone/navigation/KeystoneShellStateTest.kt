@@ -133,4 +133,39 @@ class KeystoneShellStateTest {
             assertFalse(shellState.canHandleBackAtRoot)
         }
     }
+
+    /**
+     * The two properties the flattened projection exists for: nothing is dropped, and the active
+     * tab's top is last. Asserted per tab because the ordering is derived from
+     * `TopLevelDestination.entries`, so a fourth destination must not need this test rewritten.
+     */
+    @Test
+    fun `the flattened stack ends with the active tab and keeps every other key`() {
+        val shellState = state()
+        TopLevelDestination.entries.forEach { destination ->
+            composeRule.runOnIdle { shellState.select(destination) }
+            composeRule.runOnIdle {
+                val flattened = shellState.flattenedBackStack
+                assertEquals(
+                    TopLevelDestination.entries.filter { it != destination }.map { it.rootKey } +
+                        destination.rootKey,
+                    flattened,
+                    "${destination.name} should sit last, behind the other tabs in enum order",
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `the flattened stack ends with the deepest entry of the active tab`() {
+        val shellState = state()
+        composeRule.runOnIdle { shellState.select(TopLevelDestination.PROFILE) }
+        composeRule.runOnIdle { shellState.currentBackStack.add(detailKey) }
+        composeRule.runOnIdle {
+            assertEquals(
+                listOf(HomeKey, WeekKey, ProfileKey, detailKey),
+                shellState.flattenedBackStack,
+            )
+        }
+    }
 }

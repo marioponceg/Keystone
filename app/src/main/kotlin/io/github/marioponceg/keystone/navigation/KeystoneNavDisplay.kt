@@ -103,7 +103,6 @@ fun KeystoneShell(
     detailPane: @Composable (CharacterDetailKey, () -> Unit) -> Unit,
 ) {
     val listDetailStrategy = rememberListDetailSceneStrategy<NavKey>(directive = directive)
-    val backStack = shellState.currentBackStack
     // NavDisplay installs its own predictive-back handling, but only while its stack can pop. This
     // covers the other half: a non-Home tab sitting at its root, where Back must return to Home
     // rather than leave the app.
@@ -116,8 +115,11 @@ fun KeystoneShell(
         windowInfo = windowInfo,
     ) {
         NavDisplay(
-            backStack = backStack,
-            onBack = { backStack.removeLastOrNull() },
+            backStack = shellState.currentBackStack,
+            // Routed through the shell state rather than popping the list directly, so the one Back
+            // policy lives in one place — and so it stays correct if the list NavDisplay is handed
+            // ever stops being the active tab's own stack.
+            onBack = { shellState.onBack() },
             sceneStrategy = listDetailStrategy,
             entryDecorators = listOf(
                 rememberSaveableStateHolderNavEntryDecorator(),
@@ -129,7 +131,7 @@ fun KeystoneShell(
                         detailPlaceholder = { CharacterDetailPlaceholder() },
                     ),
                 ) {
-                    homePane { id -> backStack.pushCharacter(id) }
+                    homePane { id -> shellState.currentBackStack.pushCharacter(id) }
                 }
                 entry<WeekKey> { weekPane() }
                 entry<ProfileKey>(
@@ -137,12 +139,12 @@ fun KeystoneShell(
                         detailPlaceholder = { CharacterDetailPlaceholder() },
                     ),
                 ) {
-                    profilePane { id -> backStack.pushCharacter(id) }
+                    profilePane { id -> shellState.currentBackStack.pushCharacter(id) }
                 }
                 entry<CharacterDetailKey>(
                     metadata = ListDetailSceneStrategy.detailPane(),
                 ) { key ->
-                    detailPane(key) { backStack.removeLastOrNull() }
+                    detailPane(key) { shellState.onBack() }
                 }
             },
         )
