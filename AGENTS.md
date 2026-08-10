@@ -134,14 +134,41 @@ commit history, PRs, and code.
 - **v0.4 scope**: run depth on the existing Raider.IO response — an expandable best-run card
   (affixes, dungeon icon, completion date) and a Custom Tab to the run's page. No new request, no
   new data source, no backend. Two sequential PRs off `main`, no stack.
+- **One `NavBackStack` per top-level destination, decorated as two different lists.**
+  `KeystoneShellState` owns a separate `NavBackStack` per tab (`HOME`, `WEEK`, `PROFILE`). The Back
+  policy: within a tab, pop that tab's stack; at a non-Home tab's root, Back returns to Home; at
+  Home's root, Back is not intercepted, so the app exits.
+
+  Enforcing that policy needs **two different lists**, not one, because Navigation3 disposes an
+  entry — `ViewModelStore.clear()`, `SaveableStateHolder.removeState()` — the instant its key
+  leaves whatever list it was decorated against. `rememberDecoratedNavEntries` is handed
+  `KeystoneShellState.flattenedBackStack`: every tab's entries concatenated, the active tab's last.
+  That is what keeps the inactive tabs' state alive across a switch — decorating only the active
+  tab's keys is what used to wipe every other tab on every switch. `NavDisplay`, in contrast, is
+  handed only the active tab's slice (the tail of that same flattened list), because handing it the
+  flattened list makes `Scene.previousEntries` non-empty even at a tab's root, which enables
+  `NavDisplay`'s own back handler and swallows the Back that should leave the app. That was
+  measured, not theorised: `isFinishing` went `true` → `false` once the two lists were collapsed
+  into one. `NavDisplay`'s `List<NavEntry<T>>` overload does not re-decorate, so there is no second
+  disposal pass to reason about. `KeystoneShellRetentionTest` pins the flattened-list half (every
+  tab survives a switch); `KeystoneShellBackTest` pins the sliced half (Back exits at Home's root,
+  returns to Home elsewhere). Neither test passes if the two lists are collapsed back into one.
 - **The navigation container choice is a window-level fact.** `NavigationBar` below medium width,
   `NavigationRail` at medium and above, chosen from `KeystoneWindowInfo` and never from a `UiState`
   — the same rule that already governs the realm picker's dialog-versus-sheet decision.
-- **The bar's inset must be consumed, not applied twice.** `NavigationBar`/`NavigationRail` apply
-  the system inset on their own edge, and the pane beside them calls `consumeWindowInsets` for that
-  edge so `safeDrawingContentPadding` inside a list reads only the remainder. Content is bounded
-  above the app bar rather than scrolling behind it: the edge-to-edge rule is about the translucent
-  *system* bars, and an opaque app-drawn bar hides whatever passes under it.
+- **The bar's inset must be consumed, not applied twice — with the component's own inset, never a
+  stand-in for it.** `NavigationBar`/`NavigationRail` apply the system inset on their own edge, and
+  the pane beside them calls `consumeWindowInsets` for that same edge so `safeDrawingContentPadding`
+  inside a list reads only the remainder. What gets consumed must be the component's own declared
+  inset — `NavigationBarDefaults.windowInsets` / `NavigationRailDefaults.windowInsets` — not
+  `WindowInsets.safeDrawing`, which looks like the obvious shorthand and silently ate the IME:
+  `safeDrawing` is `systemBars ∪ displayCutout ∪ ime`, but the bar and rail only ever apply
+  `systemBars ∪ displayCutout` on their edge. Consuming `safeDrawing` there consumed the keyboard
+  too, so the bottom `safeDrawingContentPadding` read was not "only the remainder" as first written
+  here — it was zero, keyboard open or not, and the keyboard covered the bottom of the list
+  uncontested. Fixed in `KeystoneNavigationScaffold.kt`. Content is bounded above the app bar rather
+  than scrolling behind it: the edge-to-edge rule is about the translucent *system* bars, and an
+  opaque app-drawn bar hides whatever passes under it.
 
 Any design decision **not** listed above must be raised with the maintainer before implementing.
 
