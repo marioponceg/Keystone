@@ -17,6 +17,7 @@ import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDe
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberDecoratedNavEntries
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import io.github.marioponceg.foundry.tokens.FoundryTheme
@@ -109,44 +110,57 @@ fun KeystoneShell(
     BackHandler(enabled = shellState.canHandleBackAtRoot) {
         shellState.onBack()
     }
+    // Step one: decorate every tab's keys. Decoration is where the entry lifetime is decided —
+    // rememberDecoratedNavEntries disposes an entry, and so runs each decorator's onPop
+    // (SaveableStateHolder.removeState, ViewModelStore.clear), only when its key leaves the list
+    // *it* was handed. Handing it the flattened stack is therefore what keeps the tabs the user is
+    // not on from being wiped on every switch.
+    val decoratedEntries = rememberDecoratedNavEntries(
+        backStack = shellState.flattenedBackStack,
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator(),
+        ),
+        entryProvider = entryProvider {
+            entry<HomeKey>(
+                metadata = ListDetailSceneStrategy.listPane(
+                    detailPlaceholder = { CharacterDetailPlaceholder() },
+                ),
+            ) {
+                homePane { id -> shellState.currentBackStack.pushCharacter(id) }
+            }
+            entry<WeekKey> { weekPane() }
+            entry<ProfileKey>(
+                metadata = ListDetailSceneStrategy.listPane(
+                    detailPlaceholder = { CharacterDetailPlaceholder() },
+                ),
+            ) {
+                profilePane { id -> shellState.currentBackStack.pushCharacter(id) }
+            }
+            entry<CharacterDetailKey>(
+                metadata = ListDetailSceneStrategy.detailPane(),
+            ) { key ->
+                detailPane(key) { shellState.onBack() }
+            }
+        },
+    )
     KeystoneNavigationScaffold(
         selected = shellState.selected,
         onSelect = shellState::select,
         windowInfo = windowInfo,
     ) {
+        // Step two: display only the active tab's slice, which is the tail of the flattened stack
+        // by construction. This overload of NavDisplay decorates nothing — it reads the entries it
+        // is given straight into a scene — and it derives its own back handler from them, enabling
+        // it whenever the scene reports previous entries. Show it the whole flattened list and
+        // that is never empty, so the handler stays enabled at a tab's root and swallows the Back
+        // that should leave the app. See KeystoneShellBackTest.
         NavDisplay(
-            backStack = shellState.currentBackStack,
-            // Routed through the shell state rather than popping the list directly, so the one Back
-            // policy lives in one place — and so it stays correct if the list NavDisplay is handed
-            // ever stops being the active tab's own stack.
+            entries = decoratedEntries.takeLast(shellState.currentBackStack.size),
+            // Pops the tab the user is in. The slice above is a projection, and the flattened list
+            // behind it is rebuilt on every read; neither is a thing to mutate.
             onBack = { shellState.onBack() },
             sceneStrategy = listDetailStrategy,
-            entryDecorators = listOf(
-                rememberSaveableStateHolderNavEntryDecorator(),
-                rememberViewModelStoreNavEntryDecorator(),
-            ),
-            entryProvider = entryProvider {
-                entry<HomeKey>(
-                    metadata = ListDetailSceneStrategy.listPane(
-                        detailPlaceholder = { CharacterDetailPlaceholder() },
-                    ),
-                ) {
-                    homePane { id -> shellState.currentBackStack.pushCharacter(id) }
-                }
-                entry<WeekKey> { weekPane() }
-                entry<ProfileKey>(
-                    metadata = ListDetailSceneStrategy.listPane(
-                        detailPlaceholder = { CharacterDetailPlaceholder() },
-                    ),
-                ) {
-                    profilePane { id -> shellState.currentBackStack.pushCharacter(id) }
-                }
-                entry<CharacterDetailKey>(
-                    metadata = ListDetailSceneStrategy.detailPane(),
-                ) { key ->
-                    detailPane(key) { shellState.onBack() }
-                }
-            },
         )
     }
 }

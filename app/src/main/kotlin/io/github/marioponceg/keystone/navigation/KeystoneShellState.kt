@@ -14,23 +14,24 @@ import androidx.navigation3.runtime.rememberNavBackStack
 /**
  * One back stack per tab, plus which tab is showing.
  *
- * Navigation3 drives a single `NavDisplay` from a single list of keys, so the stacks are held here
- * and the active one is handed over.
+ * Navigation3 hangs two separate things off a list of keys, and `KeystoneShell` gives each of them
+ * a different list — which is the whole reason [flattenedBackStack] exists alongside
+ * [currentBackStack].
  *
- * **Known defect: a tab switch destroys the other tabs' state.** `NavDisplay` disposes any entry
- * whose `contentKey` is missing from the list it was last given, and disposal invokes every entry
- * decorator's `onPop` — `SaveableStateHolder.removeState` and `ViewModelStore.clear` for the two
- * decorators `KeystoneShell` installs. Handing over only the active tab's stack therefore erases
- * every other tab on every switch: Home → Week wipes what was under `HomeKey`, and Week → Home →
- * Week rebuilds `WeekViewModel` and re-fetches the affixes. `KeystoneShellRetentionTest` states the
- * behaviour that is wanted and is `@Ignore`d until it holds.
+ * **Entry lifetime** follows the list handed to `rememberDecoratedNavEntries`. An entry is disposed
+ * when its key leaves that list, and disposal invokes every decorator's `onPop` —
+ * `SaveableStateHolder.removeState` and `ViewModelStore.clear` for the two the shell installs. So
+ * that call gets [flattenedBackStack], and a tab switch drops nothing. Decorating only the active
+ * tab's keys is what used to wipe every other tab on every switch: Home → Week erased what was
+ * under `HomeKey`, and Week → Home → Week rebuilt `WeekViewModel` and re-fetched the affixes.
  *
- * The documented remedy — hand `NavDisplay` every tab's keys concatenated, active tab last — fixes
- * retention and leaves the list-detail split correct (`KeystoneShellListDetailTest` covers all
- * three tabs), but breaks Back: `NavDisplay` enables its own back handler whenever
- * `Scene.previousEntries` is non-empty, and the foreign keys ahead of the active tail always make
- * it non-empty, so Back at Home's root stops leaving the app. `KeystoneShellBackTest` is the
- * tripwire. Resolving that is a design decision for the maintainer, not something to route around.
+ * **Back** follows the list handed to `NavDisplay`, which enables a back handler of its own
+ * whenever the scene it computes reports previous entries. So that gets the active tab's slice
+ * only. Given the flattened list instead, the foreign keys ahead of the active tail make
+ * `Scene.previousEntries` permanently non-empty, and Back at Home's root stops leaving the app.
+ *
+ * `KeystoneShellRetentionTest` and `KeystoneShellBackTest` pin one side each; neither passes if the
+ * two lists are collapsed back into one.
  *
  * **Verify tab behaviour on a device too.** Robolectric captures composables in isolation, the same
  * structural blind spot that let the v0.4 inset bug survive three versions of goldens.
@@ -49,14 +50,16 @@ class KeystoneShellState(
 
     /**
      * Every tab's stack concatenated, **the active tab's last** — Navigation3's documented shape
-     * for multiple back stacks, and the remedy the class KDoc describes.
+     * for multiple back stacks, and what `KeystoneShell` decorates so no tab is ever disposed.
      *
-     * Not wired into [KeystoneShell] yet, and deliberately kept as the one place that spelling
-     * lives so the blocked fix is a one-line change rather than a rediscovery. The order of the
-     * inactive tabs comes from `TopLevelDestination.entries` rather than being written out, so a
-     * fourth destination joins it without anyone remembering to. It is a projection for rendering,
-     * never a thing to mutate: pushing goes through [currentBackStack] and popping through
-     * [onBack], both of which act on the tab the user is actually in.
+     * The active tab going last is not cosmetic: it makes the active tab's stack the *tail* of this
+     * list, which is what lets the shell slice the entries it displays straight off the end. The
+     * order of the inactive tabs comes from `TopLevelDestination.entries` rather than being written
+     * out, so a fourth destination joins it without anyone remembering to.
+     *
+     * A projection, never a thing to mutate — it is rebuilt from the per-tab stacks on every read.
+     * Pushing goes through [currentBackStack] and popping through [onBack], both of which act on
+     * the tab the user is actually in.
      */
     val flattenedBackStack: List<NavKey> get() = flattened.value
 

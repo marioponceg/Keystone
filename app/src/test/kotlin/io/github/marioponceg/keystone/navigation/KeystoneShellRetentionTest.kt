@@ -22,7 +22,6 @@ import io.github.marioponceg.foundry.components.FoundryButton
 import io.github.marioponceg.foundry.components.FoundryText
 import io.github.marioponceg.foundry.tokens.FoundryTheme
 import io.github.marioponceg.keystone.ui.adaptive.KeystoneWindowInfo
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,17 +31,12 @@ import org.robolectric.annotation.Config
 /**
  * The point of the per-tab back stacks: a tab you leave and come back to is where you left it.
  *
- * **Red, and `@Ignore`d rather than deleted.** This is the specification for a known defect, not a
- * description of what the shell does. `NavDisplay` disposes any entry whose `contentKey` is missing
- * from the list it was last given, and disposal runs every decorator's `onPop` — for the two
- * decorators `KeystoneShell` installs that is `SaveableStateHolder.removeState` and
- * `ViewModelStore.clear`. `KeystoneShell` hands over only the active tab's stack, so every switch
- * erases the tabs the user is not on.
- *
- * Both tests below pass the moment `NavDisplay` is given `KeystoneShellState.flattenedBackStack`
- * instead, which is why that property exists. What blocks that one-line change is Back, not these:
- * see the `KeystoneShellState` KDoc and [KeystoneShellBackTest]. Delete the `@Ignore`s together
- * with whatever resolves it.
+ * What makes it work is where the decoration happens. An entry is disposed — and disposal runs each
+ * decorator's `onPop`, here `SaveableStateHolder.removeState` and `ViewModelStore.clear` — when its
+ * key leaves the list handed to `rememberDecoratedNavEntries`. `KeystoneShell` hands that call
+ * every tab's keys, so a switch drops nothing, and hands `NavDisplay` only the active tab's slice,
+ * which is what keeps Back correct ([KeystoneShellBackTest]). Decorate the active tab's keys alone
+ * and both tests below go red.
  *
  * Run at compact width so nothing here depends on the list-detail pane split; the scene strategy
  * gets its own coverage in [KeystoneShellListDetailTest].
@@ -94,7 +88,6 @@ class KeystoneShellRetentionTest {
     }
 
     @Test
-    @Ignore(PENDING)
     fun leavingATabAndComingBackKeepsItsScreenState() {
         lateinit var shellState: KeystoneShellState
         composeRule.setContent {
@@ -118,7 +111,6 @@ class KeystoneShellRetentionTest {
      * fetches the affixes, so a Week entry rebuilt on every visit means a request on every visit.
      */
     @Test
-    @Ignore(PENDING)
     fun aTabVisitedTwiceIsNotRebuiltTheSecondTime() {
         lateinit var shellState: KeystoneShellState
         composeRule.setContent {
@@ -134,9 +126,6 @@ class KeystoneShellRetentionTest {
     }
 
     private companion object {
-        const val PENDING =
-            "Known defect: KeystoneShell hands NavDisplay only the active tab's stack, so a switch " +
-                "disposes every other tab. See the KeystoneShellState KDoc."
         const val TAG_HOME_COUNTER = "test_home_counter"
         const val TAG_WEEK_COUNTER = "test_week_counter"
         const val COMPACT_WIDTH_DP = 411f
