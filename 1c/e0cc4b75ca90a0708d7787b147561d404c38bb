@@ -1,0 +1,27 @@
+app/src/main/kotlin/io/github/marioponceg/keystone/MainActivity.kt
+  s_deb27e21730888::t_c2fe12083dd72a 27
+app/src/main/kotlin/io/github/marioponceg/keystone/navigation/KeystoneNavDisplay.kt
+  s_deb27e21730888::t_e890717482c5b1 3,24-25,32-33,36-37,41,51,55,57,61-64,88,97,99,101-102,106-132,134-160
+app/src/main/kotlin/io/github/marioponceg/keystone/ui/profile/ProfileScreen.kt
+  s_deb27e21730888::t_bcc1a1cb72c436 34-42
+app/src/test/kotlin/io/github/marioponceg/keystone/navigation/KeystoneShellNavigationTest.kt
+  s_deb27e21730888::t_bc4310ac30fa79 22,56-58,69,71,79-80,87,89,94,104,106,114,119-145
+app/src/test/kotlin/io/github/marioponceg/keystone/navigation/KeystoneShellScreenshotTest.kt
+  s_deb27e21730888::t_c742cdd4a5b49e 9-10,20,23,56-61,63-64,69-87,98,100,102-103,115,127,130,133-134,137-138,149,181,183,185-186,214-276
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "1ce0cc4b75ca90a0708d7787b147561d404c38bb",
+  "prompts": {},
+  "sessions": {
+    "s_deb27e21730888": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-af980c03a21b27915",
+        "model": "unknown"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    }
+  }
+}
