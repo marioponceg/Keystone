@@ -7,10 +7,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
-import androidx.navigation3.runtime.rememberNavBackStack
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.marioponceg.foundry.tokens.FoundryTheme
-import io.github.marioponceg.keystone.navigation.HomeKey
 import io.github.marioponceg.keystone.navigation.KeystoneNavDisplay
 import io.github.marioponceg.keystone.ui.common.StatusBarProtection
 
@@ -26,7 +24,7 @@ class MainActivity : ComponentActivity() {
                 // behind the status bar is a property of the whole app, not of one pane, and
                 // putting it here means no future screen can forget it.
                 Box(modifier = Modifier.fillMaxSize()) {
-                    KeystoneNavDisplay(backStack = rememberNavBackStack(HomeKey))
+                    KeystoneNavDisplay()
                     StatusBarProtection()
                 }
             }

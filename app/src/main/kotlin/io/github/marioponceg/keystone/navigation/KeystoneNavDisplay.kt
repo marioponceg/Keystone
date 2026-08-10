@@ -1,5 +1,6 @@
 package io.github.marioponceg.keystone.navigation
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.adaptive.layout.PaneScaffoldDirective
@@ -20,20 +21,24 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import io.github.marioponceg.foundry.tokens.FoundryTheme
 import io.github.marioponceg.keystone.domain.model.CharacterId
+import io.github.marioponceg.keystone.ui.adaptive.KeystoneNavigationScaffold
+import io.github.marioponceg.keystone.ui.adaptive.KeystoneWindowInfo
 import io.github.marioponceg.keystone.ui.adaptive.rememberKeystoneWindowInfo
 import io.github.marioponceg.keystone.ui.character.CharacterDetailPlaceholder
 import io.github.marioponceg.keystone.ui.character.CharacterDetailScreen
 import io.github.marioponceg.keystone.ui.character.CharacterDetailViewModel
 import io.github.marioponceg.keystone.ui.common.openInCustomTab
 import io.github.marioponceg.keystone.ui.home.HomeScreen
+import io.github.marioponceg.keystone.ui.profile.ProfileScreen
+import io.github.marioponceg.keystone.ui.week.WeekScreen
 
 /**
- * Production entry point: wires the Hilt-backed screens into [KeystoneShell] and derives the pane
- * directive from the real window.
+ * Production entry point: owns the shell state and wires the Hilt-backed screens into
+ * [KeystoneShell], deriving the pane directive from the real window.
  */
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-fun KeystoneNavDisplay(backStack: NavBackStack<NavKey>) {
+fun KeystoneNavDisplay() {
     val windowAdaptiveInfo = currentWindowAdaptiveInfoV2()
     // The directive is what turns window size *and posture* into pane partitions, so hinge-aware
     // splitting comes from here rather than from reading FoldingFeature by hand. The spacer is
@@ -42,16 +47,20 @@ fun KeystoneNavDisplay(backStack: NavBackStack<NavKey>) {
         calculatePaneScaffoldDirective(windowAdaptiveInfo)
             .copy(horizontalPartitionSpacerSize = 0.dp)
     }
-    // Still needed for the tabletop posture; the back affordance deliberately no longer comes from
-    // here. See below.
     val windowInfo = rememberKeystoneWindowInfo()
+    val shellState = rememberKeystoneShellState()
     val context = LocalContext.current
     val toolbarColor = FoundryTheme.colors.surface.toArgb()
     KeystoneShell(
-        backStack = backStack,
+        shellState = shellState,
         directive = directive,
+        windowInfo = windowInfo,
         homePane = { onNavigateToCharacter ->
             HomeScreen(onNavigateToCharacter = onNavigateToCharacter)
+        },
+        weekPane = { WeekScreen() },
+        profilePane = { onNavigateToCharacter ->
+            ProfileScreen(onCharacterSelected = onNavigateToCharacter)
         },
         detailPane = { key, onBack ->
             CharacterDetailScreen(
@@ -76,7 +85,7 @@ fun KeystoneNavDisplay(backStack: NavBackStack<NavKey>) {
 }
 
 /**
- * The adaptive shell, with the pane contents and the directive supplied by the caller.
+ * The adaptive shell, with the shell state, directive and pane content supplied by the caller.
  *
  * Parameterised rather than self-contained so screenshot tests can pass stateless pane content
  * (no Hilt) and a hand-built directive (a faked hinge). The same seam idiom as `openResource` in
@@ -85,38 +94,68 @@ fun KeystoneNavDisplay(backStack: NavBackStack<NavKey>) {
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun KeystoneShell(
-    backStack: NavBackStack<NavKey>,
+    shellState: KeystoneShellState,
     directive: PaneScaffoldDirective,
+    windowInfo: KeystoneWindowInfo,
     homePane: @Composable ((CharacterId) -> Unit) -> Unit,
+    weekPane: @Composable () -> Unit,
+    profilePane: @Composable ((CharacterId) -> Unit) -> Unit,
     detailPane: @Composable (CharacterDetailKey, () -> Unit) -> Unit,
 ) {
     val listDetailStrategy = rememberListDetailSceneStrategy<NavKey>(directive = directive)
-    NavDisplay(
-        backStack = backStack,
-        onBack = { backStack.removeLastOrNull() },
-        sceneStrategy = listDetailStrategy,
-        entryDecorators = listOf(
-            rememberSaveableStateHolderNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator(),
-        ),
-        entryProvider = entryProvider {
-            entry<HomeKey>(
-                metadata = ListDetailSceneStrategy.listPane(
-                    detailPlaceholder = { CharacterDetailPlaceholder() },
-                ),
-            ) {
-                homePane { id ->
-                    val key = id.toKey()
-                    if (backStack.lastOrNull() != key) {
-                        backStack.add(key)
-                    }
+    val backStack = shellState.currentBackStack
+    // NavDisplay installs its own predictive-back handling, but only while its stack can pop. This
+    // covers the other half: a non-Home tab sitting at its root, where Back must return to Home
+    // rather than leave the app.
+    BackHandler(enabled = shellState.canHandleBackAtRoot) {
+        shellState.onBack()
+    }
+    KeystoneNavigationScaffold(
+        selected = shellState.selected,
+        onSelect = shellState::select,
+        windowInfo = windowInfo,
+    ) {
+        NavDisplay(
+            backStack = backStack,
+            onBack = { backStack.removeLastOrNull() },
+            sceneStrategy = listDetailStrategy,
+            entryDecorators = listOf(
+                rememberSaveableStateHolderNavEntryDecorator(),
+                rememberViewModelStoreNavEntryDecorator(),
+            ),
+            entryProvider = entryProvider {
+                entry<HomeKey>(
+                    metadata = ListDetailSceneStrategy.listPane(
+                        detailPlaceholder = { CharacterDetailPlaceholder() },
+                    ),
+                ) {
+                    homePane { id -> backStack.pushCharacter(id) }
                 }
-            }
-            entry<CharacterDetailKey>(
-                metadata = ListDetailSceneStrategy.detailPane(),
-            ) { key ->
-                detailPane(key) { backStack.removeLastOrNull() }
-            }
-        },
-    )
+                entry<WeekKey> { weekPane() }
+                entry<ProfileKey>(
+                    metadata = ListDetailSceneStrategy.listPane(
+                        detailPlaceholder = { CharacterDetailPlaceholder() },
+                    ),
+                ) {
+                    profilePane { id -> backStack.pushCharacter(id) }
+                }
+                entry<CharacterDetailKey>(
+                    metadata = ListDetailSceneStrategy.detailPane(),
+                ) { key ->
+                    detailPane(key) { backStack.removeLastOrNull() }
+                }
+            },
+        )
+    }
+}
+
+/**
+ * Shared by the Home and Profile panes so the dedupe guard lives in one place: opening the
+ * character already on top must be a no-op, or a double tap costs the user two presses of Back.
+ */
+private fun NavBackStack<NavKey>.pushCharacter(id: CharacterId) {
+    val key = id.toKey()
+    if (lastOrNull() != key) {
+        add(key)
+    }
 }

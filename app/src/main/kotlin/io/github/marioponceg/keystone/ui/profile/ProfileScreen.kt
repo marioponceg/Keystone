@@ -31,6 +31,15 @@ import io.github.marioponceg.foundry.tokens.FoundryTheme
 import io.github.marioponceg.keystone.domain.model.CharacterId
 import io.github.marioponceg.keystone.ui.common.safeDrawingContentPadding
 
+/**
+ * No ViewModel yet: the pinned-characters data source arrives in a later task, so this renders
+ * [ProfileUiState.Empty] unconditionally.
+ */
+@Composable
+fun ProfileScreen(onCharacterSelected: (CharacterId) -> Unit) {
+    ProfileContent(state = ProfileUiState.Empty, onCharacterSelected = onCharacterSelected)
+}
+
 @Composable
 fun ProfileContent(state: ProfileUiState, onCharacterSelected: (CharacterId) -> Unit) {
     val spacing = FoundryTheme.spacing
