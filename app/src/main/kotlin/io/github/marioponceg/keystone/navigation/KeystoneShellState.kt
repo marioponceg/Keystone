@@ -60,6 +60,20 @@ class KeystoneShellState(
      * A projection, never a thing to mutate — it is rebuilt from the per-tab stacks on every read.
      * Pushing goes through [currentBackStack] and popping through [onBack], both of which act on
      * the tab the user is actually in.
+     *
+     * **Duplicate-key hazard, currently unreachable.** Nothing stops the same [NavKey] appearing
+     * twice in this list — e.g. a `CharacterDetailKey` pushed from both the Home tab and the
+     * Profile tab for the same character. Navigation3 tracks entry presence by a `Set` of content
+     * keys, not a count, so this is not a crash: the two occurrences collapse onto one
+     * `ViewModelStore` and one `SaveableStateHolder` slot, and popping the copy in one tab does not
+     * fire `onPop` while the other tab's copy still holds that key in the list. That leaves the
+     * shared state alive under a key one of the two tabs believes it has left — which is silent
+     * today only because it does not resolve into a *visible* inconsistency yet.
+     *
+     * It is unreachable today because `ProfileScreen` renders its `Empty` state unconditionally, so
+     * nothing can be pushed from the Profile tab. It becomes reachable the moment Profile gains real
+     * characters, on the natural path: open a character from Search (Home), then open the same
+     * character from Profile. Design for the collision then — this class does not resolve it now.
      */
     val flattenedBackStack: List<NavKey> get() = flattened.value
 
