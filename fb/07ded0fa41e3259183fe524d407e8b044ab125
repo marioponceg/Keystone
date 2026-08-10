@@ -1,0 +1,27 @@
+app/src/main/kotlin/io/github/marioponceg/keystone/ui/home/HomeScreen.kt
+  s_5ee4dbb19c4135::t_b94244bb496156 78,88-89,185-186
+app/src/main/kotlin/io/github/marioponceg/keystone/ui/home/HomeViewModel.kt
+  s_5ee4dbb19c4135::t_f83455f1a00ac0 86
+app/src/test/kotlin/io/github/marioponceg/keystone/ui/home/HomeMediumScreenshotTest.kt
+  s_5ee4dbb19c4135::t_3b082aa1bfcfd0 30
+app/src/test/kotlin/io/github/marioponceg/keystone/ui/home/HomeScreenshotTest.kt
+  s_5ee4dbb19c4135::t_904241a378e987 17-18
+app/src/test/kotlin/io/github/marioponceg/keystone/ui/home/HomeViewModelTest.kt
+  s_5ee4dbb19c4135::t_3029045e4913f1 46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "fb07ded0fa41e3259183fe524d407e8b044ab125",
+  "prompts": {},
+  "sessions": {
+    "s_5ee4dbb19c4135": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a8c6522c0c390d3a0",
+        "model": "unknown"
+      },
+      "human_author": "Mario Ponce Garcia <marioponcegarcia@gmail.com>"
+    }
+  }
+}
