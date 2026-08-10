@@ -77,7 +77,16 @@ class KeystoneShellNavigationTest {
                 )
             },
             weekPane = { FoundryText(text = "week") },
-            profilePane = { FoundryText(text = "profile") },
+            // Mirrors homePane rather than throwing the callback away: a profilePane that ignored
+            // it would let this file's cross-tab test pass even if the shell pushed onto the Home
+            // stack, which is the one thing that test exists to rule out.
+            profilePane = { onNavigateToCharacter ->
+                FoundryButton(
+                    text = "Open character from profile",
+                    onClick = { onNavigateToCharacter(characterId) },
+                    modifier = Modifier.testTag(TAG_OPEN_FROM_PROFILE),
+                )
+            },
             detailPane = { key, _ -> FoundryText(text = key.name) },
         )
     }
@@ -119,6 +128,10 @@ class KeystoneShellNavigationTest {
     /**
      * Profile pushes onto the Profile stack, never onto Home's. Getting this wrong would put a
      * character detail behind the wrong tab and make Back leave the section the user was in.
+     *
+     * Driven through the shell's own Profile entry — select the tab, then click the button the
+     * profile pane draws — so what is under test is the wiring in `KeystoneShell`, not a hand-made
+     * `add` on whatever stack the test happened to pick.
      */
     @Test
     fun openingACharacterFromProfilePushesOntoTheProfileStack() {
@@ -128,7 +141,7 @@ class KeystoneShellNavigationTest {
         }
 
         composeRule.runOnIdle { shellState.select(TopLevelDestination.PROFILE) }
-        composeRule.runOnIdle { shellState.currentBackStack.add(characterId.toKey()) }
+        composeRule.onNodeWithTag(TAG_OPEN_FROM_PROFILE).performClick()
 
         composeRule.runOnIdle {
             assertEquals(
@@ -143,7 +156,26 @@ class KeystoneShellNavigationTest {
         }
     }
 
+    /** The Profile side of the dedupe guard, which had no coverage at all. */
+    @Test
+    fun openingTheSameCharacterTwiceFromProfileDoesNotStackADuplicateEntry() {
+        lateinit var shellState: KeystoneShellState
+        composeRule.setContent {
+            FoundryTheme { TestShell(onShellState = { shellState = it }) }
+        }
+
+        composeRule.runOnIdle { shellState.select(TopLevelDestination.PROFILE) }
+        composeRule.onNodeWithTag(TAG_OPEN_FROM_PROFILE).performClick()
+        composeRule.onNodeWithTag(TAG_OPEN_FROM_PROFILE).performClick()
+
+        assertEquals(
+            listOf(ProfileKey, characterId.toKey()),
+            shellState.backStackFor(TopLevelDestination.PROFILE).toList(),
+        )
+    }
+
     private companion object {
         const val TAG_OPEN = "test_open_character"
+        const val TAG_OPEN_FROM_PROFILE = "test_open_character_from_profile"
     }
 }
