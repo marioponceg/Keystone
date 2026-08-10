@@ -29,15 +29,20 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * What the two-pane layout actually shows once `NavDisplay` is handed every tab's keys.
+ * The two-pane layout stays correct because `NavDisplay` sees only the active tab's entries,
+ * not every tab's at once. Here's how that works: `KeystoneShellState` exposes a
+ * `flattenedBackStack` containing every tab's keys, which `rememberDecoratedNavEntries`
+ * decorates so each tab's ViewModels and saveable state survive a switch
+ * ([KeystoneShellRetentionTest]). `NavDisplay` is handed only the active tab's slice of
+ * those decorated entries, so `ListDetailSceneStrategy` never walks into a foreign tab's keys
+ * — it builds the split from exactly what it saw under the original single-stack wiring.
  *
- * `ListDetailSceneStrategy` builds its scene by walking the list backwards from the end, so it now
- * meets entries belonging to other tabs — including a second `listPane`-tagged one, since `HomeKey`
- * and `ProfileKey` are both list panes. It stops at the first entry with no pane metadata, which
- * `WeekKey` is, and it fills each pane from the *last* entry holding that role. The two facts
- * together are why the split stays right; this file is the evidence rather than the argument.
+ * Why not just hand `NavDisplay` the flattened list? Because `Scene.previousEntries` would
+ * be non-empty at each tab's root, which enables `NavDisplay`'s back handler and stops the
+ * app from exiting on Back from Home. [KeystoneShellBackTest] enforces that arrangement.
  *
- * Expanded width throughout: at compact width there is only ever one pane and nothing to get wrong.
+ * Expanded width throughout: at compact width there is only ever one pane and nothing to
+ * get wrong.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35], qualifiers = "w1280dp-h900dp")
