@@ -50,12 +50,16 @@ class KeystoneShellState(
     }
 
     /**
-     * True while something above the root of the active tab, or a non-Home tab, can absorb Back.
-     * Drives the `BackHandler`'s enabled flag so that on Home at its root the system handles Back
-     * and the app exits.
+     * True when the active tab is sitting at its root and is not Home — the one case Back must be
+     * intercepted here.
+     *
+     * Deliberately narrow. Navigation3's `NavDisplay` installs its own predictive-back handling and
+     * already covers "the stack can pop", so a flag that were also true there would put two
+     * handlers on the same gesture. The Back policy lives on this class rather than inline in the
+     * shell so it stays in one place and stays testable.
      */
-    val canHandleBack: Boolean
-        get() = currentBackStack.size > 1 || selected != TopLevelDestination.HOME
+    val canHandleBackAtRoot: Boolean
+        get() = currentBackStack.size == 1 && selected != TopLevelDestination.HOME
 
     /** Returns true when Back was consumed here. */
     fun onBack(): Boolean {

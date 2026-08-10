@@ -106,4 +106,31 @@ class KeystoneShellStateTest {
         val shellState = state()
         composeRule.runOnIdle { assertFalse(shellState.onBack()) }
     }
+
+    @Test
+    fun `canHandleBackAtRoot is false on Home at its root`() {
+        val shellState = state()
+        composeRule.runOnIdle {
+            assertFalse(shellState.canHandleBackAtRoot)
+        }
+    }
+
+    @Test
+    fun `canHandleBackAtRoot is true on a non-Home tab at its root`() {
+        val shellState = state()
+        composeRule.runOnIdle { shellState.select(TopLevelDestination.PROFILE) }
+        composeRule.runOnIdle {
+            assertTrue(shellState.canHandleBackAtRoot)
+        }
+    }
+
+    @Test
+    fun `canHandleBackAtRoot is false on a non-Home tab with depth greater than one`() {
+        val shellState = state()
+        composeRule.runOnIdle { shellState.select(TopLevelDestination.PROFILE) }
+        composeRule.runOnIdle { shellState.backStackFor(TopLevelDestination.PROFILE).add(detailKey) }
+        composeRule.runOnIdle {
+            assertFalse(shellState.canHandleBackAtRoot)
+        }
+    }
 }
