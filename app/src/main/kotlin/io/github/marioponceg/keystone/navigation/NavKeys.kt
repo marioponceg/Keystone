@@ -10,6 +10,12 @@ import kotlinx.serialization.Serializable
 data object HomeKey : NavKey
 
 @Serializable
+data object WeekKey : NavKey
+
+@Serializable
+data object ProfileKey : NavKey
+
+@Serializable
 data class CharacterDetailKey(
     val region: String,
     val realmSlug: String,
