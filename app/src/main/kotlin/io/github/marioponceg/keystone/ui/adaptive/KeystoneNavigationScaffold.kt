@@ -3,22 +3,22 @@ package io.github.marioponceg.keystone.ui.adaptive
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailDefaults
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.NavigationRailItemColors
 import androidx.compose.material3.NavigationRailItemDefaults
@@ -78,10 +78,16 @@ private fun navigationRailItemColors(): NavigationRailItemColors {
  * touches a `UiState`.
  *
  * **On insets.** The bar and the rail apply the system inset on their own edge (Material3 does this
- * by default), and the pane then *consumes* that edge so `WindowInsets.safeDrawing` inside it —
- * which `safeDrawingContentPadding` reads — returns only what is left. Without the
- * `consumeWindowInsets` calls below, a list would add the system navigation bar's height a second
- * time underneath an app bar that already covers it.
+ * by default), and the pane then *consumes* that same edge so `safeDrawingContentPadding` inside it
+ * returns only what is left. What gets consumed must be **the component's own** declared inset —
+ * `NavigationBarDefaults.windowInsets` / `NavigationRailDefaults.windowInsets` — never a hand-rolled
+ * stand-in for it. `WindowInsets.safeDrawing` looks like the obvious shorthand and is *not*
+ * equivalent: `safeDrawing` is `systemBars ∪ displayCutout ∪ ime`, but the bar and rail only ever
+ * apply `systemBars ∪ displayCutout` on their edge, never the IME. Consuming `safeDrawing.only(Bottom)`
+ * therefore consumes strictly more than the bar applied — the surplus being the entire keyboard
+ * height — so a list's bottom padding read as zero whether or not the IME was showing, and content
+ * behind the keyboard became unreachable. The rail branch happened to be correct before this fix
+ * only because `safeDrawing`'s *start* side has no IME component to begin with.
  *
  * Content is bounded above the bar rather than scrolling behind it. That is not a retreat from
  * edge-to-edge: the rule recorded in `AGENTS.md` is about the *system* bars, which are translucent
@@ -119,7 +125,7 @@ fun KeystoneNavigationScaffold(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Start)),
+                    .consumeWindowInsets(NavigationRailDefaults.windowInsets.only(WindowInsetsSides.Start)),
             ) {
                 content()
             }
@@ -129,7 +135,7 @@ fun KeystoneNavigationScaffold(
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)),
+                    .consumeWindowInsets(NavigationBarDefaults.windowInsets.only(WindowInsetsSides.Bottom)),
             ) {
                 content()
             }
