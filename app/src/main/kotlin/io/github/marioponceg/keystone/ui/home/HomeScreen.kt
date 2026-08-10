@@ -75,7 +75,7 @@ fun HomeScreen(
 
 /**
  * Below this width Home is a single scrolling column; at or above it, the search form and recents
- * sit side by side under a full-width affixes card.
+ * sit side by side.
  *
  * Measured against the width this composable is *given*, not the window width: at expanded width
  * Home renders inside a ~400dp list pane of a 1280dp window, and must stay single-column there.
@@ -85,8 +85,8 @@ internal const val HOME_TWO_COLUMN_MIN_WIDTH_DP = 600
 /**
  * Two columns also need vertical room. Below this height the single-column layout wins even when
  * the window is wide: the two-column layout does not scroll as a whole, so in a short window
- * (split screen, a half-open foldable, a resized desktop window) the title and affixes card alone
- * could push the form out of reach. A 400dp-tall window should not pretend to be a tablet.
+ * (split screen, a half-open foldable, a resized desktop window) the title alone could push the
+ * form out of reach. A 400dp-tall window should not pretend to be a tablet.
  */
 internal const val HOME_TWO_COLUMN_MIN_HEIGHT_DP = 600
 
@@ -134,9 +134,6 @@ private fun HomeSingleColumnContent(state: HomeUiState, onEvent: (HomeEvent) -> 
             )
         }
         item {
-            AffixesCard(state = state.affixes, onRetry = { onEvent(HomeEvent.RetryAffixes) })
-        }
-        item {
             SearchForm(state = state, onEvent = onEvent)
         }
         if (state.recentSearches.isNotEmpty()) {
@@ -182,14 +179,11 @@ private fun HomeTwoColumnContent(state: HomeUiState, onEvent: (HomeEvent) -> Uni
             style = FoundryTextStyle.Display,
             modifier = Modifier.padding(top = spacing.lg),
         )
-        // Affixes span the full width: three affixes in a row is content that improves with width,
-        // unlike a text field, which does not.
-        AffixesCard(state = state.affixes, onRetry = { onEvent(HomeEvent.RetryAffixes) })
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                // Takes the height left over after the title and affixes so neither column can
-                // overflow the window: each scrolls inside its own bounded space.
+                // Takes the height left over after the title so neither column can overflow the
+                // window: each scrolls inside its own bounded space.
                 .weight(1f),
             horizontalArrangement = Arrangement.spacedBy(spacing.md),
         ) {
@@ -220,44 +214,6 @@ private fun HomeTwoColumnContent(state: HomeUiState, onEvent: (HomeEvent) -> Uni
                         recentSearchItems(recents = state.recentSearches, onEvent = onEvent)
                     }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-private fun AffixesCard(state: AffixesUiState, onRetry: () -> Unit) {
-    val spacing = FoundryTheme.spacing
-    FoundryCard(modifier = Modifier.fillMaxWidth()) {
-        when (state) {
-            is AffixesUiState.Loading -> FoundryText(
-                text = "Loading this week's affixes…",
-                style = FoundryTextStyle.Caption,
-            )
-            is AffixesUiState.Content -> {
-                FoundryText(text = state.affixes.title, style = FoundryTextStyle.Heading)
-                state.affixes.affixes.forEach { affix ->
-                    Column(modifier = Modifier.padding(top = spacing.sm)) {
-                        FoundryText(text = affix.name, style = FoundryTextStyle.BodyStrong)
-                        FoundryText(
-                            text = affix.description,
-                            style = FoundryTextStyle.Caption,
-                            color = FoundryTheme.colors.onSurfaceMuted,
-                        )
-                    }
-                }
-            }
-            is AffixesUiState.Unavailable -> {
-                FoundryText(
-                    text = "Couldn't load affixes",
-                    style = FoundryTextStyle.Caption,
-                )
-                FoundryButton(
-                    text = "Retry",
-                    onClick = onRetry,
-                    style = FoundryButtonStyle.Tertiary,
-                    modifier = Modifier.padding(top = spacing.sm),
-                )
             }
         }
     }

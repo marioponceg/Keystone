@@ -3,12 +3,10 @@ package io.github.marioponceg.keystone.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.github.marioponceg.keystone.domain.error.KeystoneResult
 import io.github.marioponceg.keystone.domain.model.CharacterId
 import io.github.marioponceg.keystone.domain.model.Realm
 import io.github.marioponceg.keystone.domain.model.Region
 import io.github.marioponceg.keystone.domain.usecase.GetRealms
-import io.github.marioponceg.keystone.domain.usecase.GetWeeklyAffixes
 import io.github.marioponceg.keystone.domain.usecase.ObserveRecentSearches
 import io.github.marioponceg.keystone.domain.usecase.ObserveSelectedRegion
 import io.github.marioponceg.keystone.domain.usecase.RemoveRecentSearch
@@ -26,7 +24,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val getWeeklyAffixes: GetWeeklyAffixes,
     private val getRealms: GetRealms,
     observeRecentSearches: ObserveRecentSearches,
     private val removeRecentSearch: RemoveRecentSearch,
@@ -44,7 +41,6 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val region = observeSelectedRegion().first()
             _uiState.update { it.copy(region = region) }
-            loadAffixes(region)
         }
         viewModelScope.launch {
             observeRecentSearches().collect { recents ->
@@ -70,7 +66,6 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.SearchSubmitted -> onSearchSubmitted()
             is HomeEvent.RecentSelected -> _effects.trySend(HomeEffect.NavigateToCharacter(event.search.id))
             is HomeEvent.RecentRemoved -> viewModelScope.launch { removeRecentSearch(event.id) }
-            is HomeEvent.RetryAffixes -> viewModelScope.launch { loadAffixes(uiState.value.region) }
         }
     }
 
@@ -88,10 +83,7 @@ class HomeViewModel @Inject constructor(
 
     private fun onRegionSelected(region: Region) {
         _uiState.update { it.copy(region = region, selectedRealm = null) }
-        viewModelScope.launch {
-            saveSelectedRegion(region)
-            loadAffixes(region)
-        }
+        viewModelScope.launch { saveSelectedRegion(region) }
     }
 
     private fun onSearchSubmitted() {
@@ -99,14 +91,5 @@ class HomeViewModel @Inject constructor(
         val realm = state.selectedRealm ?: return
         if (state.name.isBlank()) return
         _effects.trySend(HomeEffect.NavigateToCharacter(CharacterId(state.region, realm, state.name.trim())))
-    }
-
-    private suspend fun loadAffixes(region: Region) {
-        _uiState.update { it.copy(affixes = AffixesUiState.Loading) }
-        val affixes = when (val result = getWeeklyAffixes(region)) {
-            is KeystoneResult.Success -> AffixesUiState.Content(result.value)
-            is KeystoneResult.Failure -> AffixesUiState.Unavailable
-        }
-        _uiState.update { it.copy(affixes = affixes) }
     }
 }

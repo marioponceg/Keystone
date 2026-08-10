@@ -1,22 +1,15 @@
 package io.github.marioponceg.keystone.ui.home
 
 import app.cash.turbine.test
-import io.github.marioponceg.keystone.domain.error.KeystoneError
-import io.github.marioponceg.keystone.domain.error.KeystoneResult
-import io.github.marioponceg.keystone.domain.model.Affix
 import io.github.marioponceg.keystone.domain.model.CharacterId
 import io.github.marioponceg.keystone.domain.model.Realm
 import io.github.marioponceg.keystone.domain.model.RecentSearch
 import io.github.marioponceg.keystone.domain.model.Region
-import io.github.marioponceg.keystone.domain.model.WeeklyAffixes
 import io.github.marioponceg.keystone.domain.usecase.GetRealms
-import io.github.marioponceg.keystone.domain.usecase.GetWeeklyAffixes
 import io.github.marioponceg.keystone.domain.usecase.ObserveRecentSearches
 import io.github.marioponceg.keystone.domain.usecase.ObserveSelectedRegion
 import io.github.marioponceg.keystone.domain.usecase.RemoveRecentSearch
 import io.github.marioponceg.keystone.domain.usecase.SaveSelectedRegion
-import io.github.marioponceg.keystone.ui.FakeAffixesRepository
-import io.github.marioponceg.keystone.ui.FakeAppLocaleProvider
 import io.github.marioponceg.keystone.ui.FakeRealmRepository
 import io.github.marioponceg.keystone.ui.FakeRecentSearchesRepository
 import io.github.marioponceg.keystone.ui.FakeRegionPreferenceRepository
@@ -26,15 +19,12 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertIs
 
 class HomeViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private val weekly = WeeklyAffixes("Tyrannical week", listOf(Affix("Tyrannical", "Bosses hit harder")))
-    private val affixesRepository = FakeAffixesRepository(KeystoneResult.Success(weekly))
     private val recentsRepository = FakeRecentSearchesRepository()
     private val regionRepository = FakeRegionPreferenceRepository()
     private val euRealms = listOf(
@@ -44,10 +34,7 @@ class HomeViewModelTest {
     )
     private val realmRepository = FakeRealmRepository(mapOf(Region.EU to euRealms))
 
-    private val localeProvider = FakeAppLocaleProvider()
-
     private fun viewModel() = HomeViewModel(
-        getWeeklyAffixes = GetWeeklyAffixes(affixesRepository, localeProvider),
         getRealms = GetRealms(realmRepository),
         observeRecentSearches = ObserveRecentSearches(recentsRepository),
         removeRecentSearch = RemoveRecentSearch(recentsRepository),
@@ -56,43 +43,12 @@ class HomeViewModelTest {
     )
 
     @Test
-    fun `loads affixes for the persisted region on start`() = runTest {
-        val vm = viewModel()
-        advanceUntilIdle()
-        assertEquals(AffixesUiState.Content(weekly), vm.uiState.value.affixes)
-        assertEquals(Region.EU, affixesRepository.lastRegion)
-    }
-
-    @Test
-    fun `affixes failure hides the card without blocking search`() = runTest {
-        affixesRepository.result = KeystoneResult.Failure(KeystoneError.Network)
-        val vm = viewModel()
-        advanceUntilIdle()
-        assertIs<AffixesUiState.Unavailable>(vm.uiState.value.affixes)
-        vm.onEvent(HomeEvent.NameChanged("Thrall"))
-        vm.onEvent(HomeEvent.RealmSelected(Realm("Tarren Mill", "tarren-mill")))
-        assertEquals(true, vm.uiState.value.canSearch)
-    }
-
-    @Test
-    fun `retry reloads affixes`() = runTest {
-        affixesRepository.result = KeystoneResult.Failure(KeystoneError.Network)
-        val vm = viewModel()
-        advanceUntilIdle()
-        affixesRepository.result = KeystoneResult.Success(weekly)
-        vm.onEvent(HomeEvent.RetryAffixes)
-        advanceUntilIdle()
-        assertEquals(AffixesUiState.Content(weekly), vm.uiState.value.affixes)
-    }
-
-    @Test
-    fun `region change persists and reloads affixes`() = runTest {
+    fun `region change persists`() = runTest {
         val vm = viewModel()
         advanceUntilIdle()
         vm.onEvent(HomeEvent.RegionSelected(Region.US))
         advanceUntilIdle()
         assertEquals(Region.US, regionRepository.region.value)
-        assertEquals(Region.US, affixesRepository.lastRegion)
     }
 
     @Test
