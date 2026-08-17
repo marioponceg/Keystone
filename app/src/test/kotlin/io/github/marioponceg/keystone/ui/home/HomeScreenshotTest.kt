@@ -14,8 +14,8 @@ import org.robolectric.annotation.GraphicsMode
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 // sdk pinned to 35: the highest android-all image Robolectric ships (compileSdk is 37).
-// Tall viewport so the content state (affixes + form + recents) fits in one capture and the
-// goldens actually guard the whole screen, not just what fits a default phone height.
+// Tall viewport so the content state (form + recents) fits in one capture and the goldens
+// actually guard the whole screen, not just what fits a default phone height.
 @Config(sdk = [35], qualifiers = "w411dp-h1200dp")
 class HomeScreenshotTest {
 
@@ -44,10 +44,4 @@ class HomeScreenshotTest {
 
     @Test
     fun homeContentDark() = capture("home_content_dark", true, states[1])
-
-    @Test
-    fun homeAffixesUnavailableLight() = capture("home_affixes_unavailable_light", false, states[2])
-
-    @Test
-    fun homeAffixesUnavailableDark() = capture("home_affixes_unavailable_dark", true, states[2])
 }

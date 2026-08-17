@@ -4,10 +4,8 @@ import io.github.marioponceg.keystone.domain.model.CharacterId
 import io.github.marioponceg.keystone.domain.model.Realm
 import io.github.marioponceg.keystone.domain.model.RecentSearch
 import io.github.marioponceg.keystone.domain.model.Region
-import io.github.marioponceg.keystone.domain.model.WeeklyAffixes
 
 data class HomeUiState(
-    val affixes: AffixesUiState = AffixesUiState.Loading,
     val name: String = "",
     val selectedRealm: Realm? = null,
     val region: Region = Region.EU,
@@ -17,14 +15,6 @@ data class HomeUiState(
     val realmResults: List<Realm> = emptyList(),
 ) {
     val canSearch: Boolean get() = name.isNotBlank() && selectedRealm != null
-}
-
-sealed interface AffixesUiState {
-    data object Loading : AffixesUiState
-    data class Content(val affixes: WeeklyAffixes) : AffixesUiState
-
-    /** The affixes call failed; the card collapses to a quiet retry — search never blocks. */
-    data object Unavailable : AffixesUiState
 }
 
 sealed interface HomeEvent {
@@ -37,7 +27,6 @@ sealed interface HomeEvent {
     data object SearchSubmitted : HomeEvent
     data class RecentSelected(val search: RecentSearch) : HomeEvent
     data class RecentRemoved(val id: CharacterId) : HomeEvent
-    data object RetryAffixes : HomeEvent
 }
 
 sealed interface HomeEffect {

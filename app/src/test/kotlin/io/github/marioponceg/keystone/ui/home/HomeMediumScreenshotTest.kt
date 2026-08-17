@@ -27,7 +27,7 @@ class HomeMediumScreenshotTest {
     @get:Rule
     val composeRule = createComposeRule()
 
-    // Index 1 is the Content state: affixes loaded, form filled, recents populated.
+    // Index 1 is the Content state: form filled, recents populated.
     private val contentState = HomeStateProvider().values.toList()[1]
 
     // Index 0 is the empty state — a fresh install, nothing searched yet.

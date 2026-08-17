@@ -1,0 +1,160 @@
+package io.github.marioponceg.keystone.ui.adaptive
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarDefaults
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemColors
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailDefaults
+import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.NavigationRailItemColors
+import androidx.compose.material3.NavigationRailItemDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
+import io.github.marioponceg.foundry.tokens.FoundryTheme
+import io.github.marioponceg.keystone.navigation.TopLevelDestination
+
+const val TAG_NAV_BAR = "keystone_nav_bar"
+const val TAG_NAV_RAIL = "keystone_nav_rail"
+
+private fun TopLevelDestination.icon(): ImageVector = when (this) {
+    TopLevelDestination.HOME -> Icons.Filled.Search
+    TopLevelDestination.WEEK -> Icons.Filled.DateRange
+    TopLevelDestination.PROFILE -> Icons.Filled.Person
+}
+
+/**
+ * Foundry tokens onto the bar's item slots, following the mapping the design system already uses:
+ * `accent` + `onAccent` for the emphasised element (`FoundryButton`'s filled style), `surface` +
+ * `onSurface` for a container and its text (`FoundryCard`), `onSurfaceMuted` for anything
+ * de-emphasised. The app never installs a `MaterialTheme` colour scheme, so without this every
+ * unset slot falls back to M3's baseline purple.
+ */
+@Composable
+private fun navigationBarItemColors(): NavigationBarItemColors {
+    val colors = FoundryTheme.colors
+    return NavigationBarItemDefaults.colors(
+        selectedIconColor = colors.onAccent,
+        selectedTextColor = colors.onSurface,
+        indicatorColor = colors.accent,
+        unselectedIconColor = colors.onSurfaceMuted,
+        unselectedTextColor = colors.onSurfaceMuted,
+    )
+}
+
+/** The rail's equivalent of [navigationBarItemColors]; the two must not drift apart. */
+@Composable
+private fun navigationRailItemColors(): NavigationRailItemColors {
+    val colors = FoundryTheme.colors
+    return NavigationRailItemDefaults.colors(
+        selectedIconColor = colors.onAccent,
+        selectedTextColor = colors.onSurface,
+        indicatorColor = colors.accent,
+        unselectedIconColor = colors.onSurfaceMuted,
+        unselectedTextColor = colors.onSurfaceMuted,
+    )
+}
+
+/**
+ * The app's navigation chrome: a bottom bar on a phone, a rail from medium width upwards.
+ *
+ * Which container to draw is a window-level fact, so it arrives as [KeystoneWindowInfo] and never
+ * touches a `UiState`.
+ *
+ * **On insets.** The bar and the rail apply the system inset on their own edge (Material3 does this
+ * by default), and the pane then *consumes* that same edge so `safeDrawingContentPadding` inside it
+ * returns only what is left. What gets consumed must be **the component's own** declared inset —
+ * `NavigationBarDefaults.windowInsets` / `NavigationRailDefaults.windowInsets` — never a hand-rolled
+ * stand-in for it. `WindowInsets.safeDrawing` looks like the obvious shorthand and is *not*
+ * equivalent: `safeDrawing` is `systemBars ∪ displayCutout ∪ ime`, but the bar and rail only ever
+ * apply `systemBars ∪ displayCutout` on their edge, never the IME. Consuming `safeDrawing.only(Bottom)`
+ * therefore consumes strictly more than the bar applied — the surplus being the entire keyboard
+ * height — so a list's bottom padding read as zero whether or not the IME was showing, and content
+ * behind the keyboard became unreachable. The rail branch happened to be correct before this fix
+ * only because `safeDrawing`'s *start* side has no IME component to begin with.
+ *
+ * Content is bounded above the bar rather than scrolling behind it. That is not a retreat from
+ * edge-to-edge: the rule recorded in `AGENTS.md` is about the *system* bars, which are translucent
+ * and which content should still travel behind. An app-drawn navigation bar is opaque, so anything
+ * behind it is simply invisible.
+ *
+ * Never wrap the adaptive scaffold itself in padding — it does not propagate `PaddingValues` to its
+ * panes, and padding the parent clips the whole edge-to-edge layout.
+ */
+@Composable
+fun KeystoneNavigationScaffold(
+    selected: TopLevelDestination,
+    onSelect: (TopLevelDestination) -> Unit,
+    windowInfo: KeystoneWindowInfo = KeystoneWindowInfo.Compact,
+    content: @Composable () -> Unit,
+) {
+    if (windowInfo.isWidthAtLeastMedium) {
+        Row(modifier = Modifier.fillMaxSize()) {
+            val itemColors = navigationRailItemColors()
+            NavigationRail(
+                modifier = Modifier.testTag(TAG_NAV_RAIL),
+                containerColor = FoundryTheme.colors.surface,
+                contentColor = FoundryTheme.colors.onSurface,
+            ) {
+                TopLevelDestination.entries.forEach { destination ->
+                    NavigationRailItem(
+                        selected = destination == selected,
+                        onClick = { onSelect(destination) },
+                        icon = { Icon(destination.icon(), contentDescription = null) },
+                        label = { Text(destination.label) },
+                        colors = itemColors,
+                    )
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .consumeWindowInsets(NavigationRailDefaults.windowInsets.only(WindowInsetsSides.Start)),
+            ) {
+                content()
+            }
+        }
+    } else {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .consumeWindowInsets(NavigationBarDefaults.windowInsets.only(WindowInsetsSides.Bottom)),
+            ) {
+                content()
+            }
+            val itemColors = navigationBarItemColors()
+            NavigationBar(
+                modifier = Modifier.testTag(TAG_NAV_BAR),
+                containerColor = FoundryTheme.colors.surface,
+                contentColor = FoundryTheme.colors.onSurface,
+            ) {
+                TopLevelDestination.entries.forEach { destination ->
+                    NavigationBarItem(
+                        selected = destination == selected,
+                        onClick = { onSelect(destination) },
+                        icon = { Icon(destination.icon(), contentDescription = null) },
+                        label = { Text(destination.label) },
+                        colors = itemColors,
+                    )
+                }
+            }
+        }
+    }
+}

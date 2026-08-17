@@ -11,9 +11,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
-import androidx.navigation3.runtime.NavBackStack
-import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.window.core.layout.WindowSizeClass
 import androidx.window.core.layout.computeWindowSizeClass
 import io.github.marioponceg.foundry.components.FoundryButton
@@ -22,6 +19,7 @@ import io.github.marioponceg.foundry.tokens.FoundryTheme
 import io.github.marioponceg.keystone.domain.model.CharacterId
 import io.github.marioponceg.keystone.domain.model.Realm
 import io.github.marioponceg.keystone.domain.model.Region
+import io.github.marioponceg.keystone.ui.adaptive.KeystoneWindowInfo
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -55,9 +53,9 @@ class KeystoneShellNavigationTest {
 
     @OptIn(ExperimentalMaterial3AdaptiveApi::class)
     @Composable
-    private fun TestShell(onBackStack: (NavBackStack<NavKey>) -> Unit) {
-        val backStack = rememberNavBackStack(HomeKey)
-        onBackStack(backStack)
+    private fun TestShell(onShellState: (KeystoneShellState) -> Unit) {
+        val shellState = rememberKeystoneShellState()
+        onShellState(shellState)
         val directive = calculatePaneScaffoldDirective(
             WindowAdaptiveInfo(
                 windowSizeClass = WindowSizeClass.BREAKPOINTS_V1.computeWindowSizeClass(
@@ -68,13 +66,25 @@ class KeystoneShellNavigationTest {
             ),
         ).copy(horizontalPartitionSpacerSize = 0.dp)
         KeystoneShell(
-            backStack = backStack,
+            shellState = shellState,
             directive = directive,
+            windowInfo = KeystoneWindowInfo(isWidthAtLeastMedium = true, isTabletop = false),
             homePane = { onNavigateToCharacter ->
                 FoundryButton(
                     text = "Open character",
                     onClick = { onNavigateToCharacter(characterId) },
                     modifier = Modifier.testTag(TAG_OPEN),
+                )
+            },
+            weekPane = { FoundryText(text = "week") },
+            // Mirrors homePane rather than throwing the callback away: a profilePane that ignored
+            // it would let this file's cross-tab test pass even if the shell pushed onto the Home
+            // stack, which is the one thing that test exists to rule out.
+            profilePane = { onNavigateToCharacter ->
+                FoundryButton(
+                    text = "Open character from profile",
+                    onClick = { onNavigateToCharacter(characterId) },
+                    modifier = Modifier.testTag(TAG_OPEN_FROM_PROFILE),
                 )
             },
             detailPane = { key, _ -> FoundryText(text = key.name) },
@@ -83,14 +93,14 @@ class KeystoneShellNavigationTest {
 
     @Test
     fun navigatingToACharacterPushesTheKeyDerivedFromItsId() {
-        lateinit var backStack: NavBackStack<NavKey>
+        lateinit var shellState: KeystoneShellState
         composeRule.setContent {
-            FoundryTheme { TestShell(onBackStack = { backStack = it }) }
+            FoundryTheme { TestShell(onShellState = { shellState = it }) }
         }
 
         composeRule.onNodeWithTag(TAG_OPEN).performClick()
 
-        assertEquals(listOf(HomeKey, characterId.toKey()), backStack.toList())
+        assertEquals(listOf(HomeKey, characterId.toKey()), shellState.currentBackStack.toList())
     }
 
     /**
@@ -100,9 +110,9 @@ class KeystoneShellNavigationTest {
      */
     @Test
     fun openingTheSameCharacterTwiceDoesNotStackADuplicateEntry() {
-        lateinit var backStack: NavBackStack<NavKey>
+        lateinit var shellState: KeystoneShellState
         composeRule.setContent {
-            FoundryTheme { TestShell(onBackStack = { backStack = it }) }
+            FoundryTheme { TestShell(onShellState = { shellState = it }) }
         }
 
         composeRule.onNodeWithTag(TAG_OPEN).performClick()
@@ -110,12 +120,62 @@ class KeystoneShellNavigationTest {
 
         assertEquals(
             listOf(HomeKey, characterId.toKey()),
-            backStack.toList(),
+            shellState.currentBackStack.toList(),
             "The dedupe guard should keep the back stack at Home + one detail entry",
+        )
+    }
+
+    /**
+     * Profile pushes onto the Profile stack, never onto Home's. Getting this wrong would put a
+     * character detail behind the wrong tab and make Back leave the section the user was in.
+     *
+     * Driven through the shell's own Profile entry — select the tab, then click the button the
+     * profile pane draws — so what is under test is the wiring in `KeystoneShell`, not a hand-made
+     * `add` on whatever stack the test happened to pick.
+     */
+    @Test
+    fun openingACharacterFromProfilePushesOntoTheProfileStack() {
+        lateinit var shellState: KeystoneShellState
+        composeRule.setContent {
+            FoundryTheme { TestShell(onShellState = { shellState = it }) }
+        }
+
+        composeRule.runOnIdle { shellState.select(TopLevelDestination.PROFILE) }
+        composeRule.onNodeWithTag(TAG_OPEN_FROM_PROFILE).performClick()
+
+        composeRule.runOnIdle {
+            assertEquals(
+                listOf(ProfileKey, characterId.toKey()),
+                shellState.backStackFor(TopLevelDestination.PROFILE).toList(),
+            )
+            assertEquals(
+                listOf(HomeKey),
+                shellState.backStackFor(TopLevelDestination.HOME).toList(),
+                "The Home stack must be untouched",
+            )
+        }
+    }
+
+    /** The Profile side of the dedupe guard, which had no coverage at all. */
+    @Test
+    fun openingTheSameCharacterTwiceFromProfileDoesNotStackADuplicateEntry() {
+        lateinit var shellState: KeystoneShellState
+        composeRule.setContent {
+            FoundryTheme { TestShell(onShellState = { shellState = it }) }
+        }
+
+        composeRule.runOnIdle { shellState.select(TopLevelDestination.PROFILE) }
+        composeRule.onNodeWithTag(TAG_OPEN_FROM_PROFILE).performClick()
+        composeRule.onNodeWithTag(TAG_OPEN_FROM_PROFILE).performClick()
+
+        assertEquals(
+            listOf(ProfileKey, characterId.toKey()),
+            shellState.backStackFor(TopLevelDestination.PROFILE).toList(),
         )
     }
 
     private companion object {
         const val TAG_OPEN = "test_open_character"
+        const val TAG_OPEN_FROM_PROFILE = "test_open_character_from_profile"
     }
 }

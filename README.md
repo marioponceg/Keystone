@@ -29,10 +29,12 @@ no analytics.
 - **Mythic+ profile** — the character's avatar, season score (colored to match the official
   Raider.IO score bands) with a per-role breakdown, and best runs per dungeon with upgrade stars,
   clear times and class-colored character names.
-- **Weekly affixes** — a card on the home screen showing the current M+ affix rotation, in the
-  device's language where Raider.IO translates it (English otherwise).
+- **Weekly affixes** — its own Week tab showing the current M+ affix rotation, in the device's
+  language where Raider.IO translates it (English otherwise).
 - **Recent searches** — the last 10 lookups, deduplicated, saved only after a successful
   profile load (so a typo never pollutes the list), with per-item delete.
+- **Navigation** — bottom-bar navigation across three tabs: Search (the character lookup above),
+  Week (the affix rotation) and Profile, currently an empty state whose contents arrive next.
 - **Adaptive layout** — a two-pane list-detail layout at expanded width (tablet landscape,
   desktop, ChromeOS), a two-column home at medium width, a pane split that aligns to a foldable's
   hinge, and a tabletop layout for character detail on half-open foldables.
